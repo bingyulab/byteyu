@@ -47,6 +47,8 @@
     
       <link rel="stylesheet" href="../../stylesheets/code.css">
     
+      <link rel="stylesheet" href="../../stylesheets/math.css">
+    
     <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
@@ -836,18 +838,18 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#mle-for-betabeta" class="md-nav__link">
+  <a href="#mle-for-beta" class="md-nav__link">
     <span class="md-ellipsis">
-      MLE for \beta\beta
+      MLE for \(\beta\)
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#mle-for-sigma2sigma2" class="md-nav__link">
+  <a href="#mle-for-sigma2" class="md-nav__link">
     <span class="md-ellipsis">
-      MLE for \sigma^2\sigma^2
+      MLE for \(\sigma^2\)
     </span>
   </a>
   
@@ -1514,18 +1516,18 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#mle-for-betabeta" class="md-nav__link">
+  <a href="#mle-for-beta" class="md-nav__link">
     <span class="md-ellipsis">
-      MLE for \beta\beta
+      MLE for \(\beta\)
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#mle-for-sigma2sigma2" class="md-nav__link">
+  <a href="#mle-for-sigma2" class="md-nav__link">
     <span class="md-ellipsis">
-      MLE for \sigma^2\sigma^2
+      MLE for \(\sigma^2\)
     </span>
   </a>
   
@@ -1644,69 +1646,64 @@
 <img alt="image.png" src="https://raw.githubusercontent.com/leon2milan/FigureBed/master/20250218182124.png" /></p>
 <hr />
 <h2 id="regression">Regression</h2>
-<div class="highlight"><table class="highlighttable"><tr><th colspan="2" class="filename"><span class="filename">Python</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-1"> 1</a></span>
-<span class="normal"><a href="#__codelineno-0-2"> 2</a></span>
-<span class="normal"><a href="#__codelineno-0-3"> 3</a></span>
-<span class="normal"><a href="#__codelineno-0-4"> 4</a></span>
-<span class="normal"><a href="#__codelineno-0-5"> 5</a></span>
-<span class="normal"><a href="#__codelineno-0-6"> 6</a></span>
-<span class="normal"><a href="#__codelineno-0-7"> 7</a></span>
-<span class="normal"><a href="#__codelineno-0-8"> 8</a></span>
-<span class="normal"><a href="#__codelineno-0-9"> 9</a></span>
-<span class="normal"><a href="#__codelineno-0-10">10</a></span>
-<span class="normal"><a href="#__codelineno-0-11">11</a></span>
-<span class="normal"><a href="#__codelineno-0-12">12</a></span>
-<span class="normal"><a href="#__codelineno-0-13">13</a></span>
-<span class="normal"><a href="#__codelineno-0-14">14</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1"></a><span class="kn">import</span> <span class="nn">numpy.random</span> <span class="k">as</span> <span class="nn">npr</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2"></a><span class="kn">import</span> <span class="nn">jax.numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<a id="__codelineno-0-3" name="__codelineno-0-3"></a><span class="kn">from</span> <span class="nn">jax</span> <span class="kn">import</span> <span class="n">grad</span>
-<a id="__codelineno-0-4" name="__codelineno-0-4"></a><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-<a id="__codelineno-0-5" name="__codelineno-0-5"></a>
-<a id="__codelineno-0-6" name="__codelineno-0-6"></a><span class="c1"># first generate some random data</span>
-<a id="__codelineno-0-7" name="__codelineno-0-7"></a><span class="n">X</span> <span class="o">=</span> <span class="n">npr</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">300</span><span class="p">)</span>
-<a id="__codelineno-0-8" name="__codelineno-0-8"></a><span class="n">true_w</span><span class="p">,</span> <span class="n">true_b</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span>
-<a id="__codelineno-0-9" name="__codelineno-0-9"></a><span class="c1"># add some noise to the labels</span>
-<a id="__codelineno-0-10" name="__codelineno-0-10"></a><span class="n">Y</span> <span class="o">=</span> <span class="n">X</span><span class="o">*</span><span class="n">true_w</span> <span class="o">+</span> <span class="n">true_b</span> <span class="o">+</span> <span class="mf">0.2</span><span class="o">*</span><span class="n">npr</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">300</span><span class="p">)</span> <span class="o">+</span> <span class="n">p</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">X</span><span class="p">)</span>
-<a id="__codelineno-0-11" name="__codelineno-0-11"></a>
-<a id="__codelineno-0-12" name="__codelineno-0-12"></a><span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;blue&#39;</span><span class="p">)</span>
-<a id="__codelineno-0-13" name="__codelineno-0-13"></a><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">X</span><span class="p">),</span>  <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">X</span><span class="p">)</span><span class="o">*</span><span class="n">true_w</span> <span class="o">+</span> <span class="n">true_b</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">X</span><span class="p">)),</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">)</span>
-<a id="__codelineno-0-14" name="__codelineno-0-14"></a><span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<div class="highlight"><table class="highlighttable"><tr><th colspan="2" class="filename"><span class="filename">Python</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="kn">import</span> <span class="nn">numpy.random</span> <span class="k">as</span> <span class="nn">npr</span>
+<span class="kn">import</span> <span class="nn">jax.numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">jax</span> <span class="kn">import</span> <span class="n">grad</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+
+<span class="c1"># first generate some random data</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">npr</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">300</span><span class="p">)</span>
+<span class="n">true_w</span><span class="p">,</span> <span class="n">true_b</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span>
+<span class="c1"># add some noise to the labels</span>
+<span class="n">Y</span> <span class="o">=</span> <span class="n">X</span><span class="o">*</span><span class="n">true_w</span> <span class="o">+</span> <span class="n">true_b</span> <span class="o">+</span> <span class="mf">0.2</span><span class="o">*</span><span class="n">npr</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">300</span><span class="p">)</span> <span class="o">+</span> <span class="n">p</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">X</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;blue&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">X</span><span class="p">),</span>  <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">X</span><span class="p">)</span><span class="o">*</span><span class="n">true_w</span> <span class="o">+</span> <span class="n">true_b</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">X</span><span class="p">)),</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </code></pre></div></td></tr></table></div>
 <p><img alt="image.png" src="https://raw.githubusercontent.com/leon2milan/FigureBed/master/20250219150927.png" /></p>
 <p>Regression is a fundamental concept in statistics and machine learning that models the relationship between a dependent variable (target) and one or more independent variables (features). It is widely used for <strong>prediction, inference, and understanding data trends</strong>.</p>
 <hr />
 <h3 id="1-linear-regression"><strong>1. Linear Regression</strong></h3>
-<p>Linear regression assumes a <strong>linear relationship</strong> between the input <span class="arithmatex"><span class="MathJax_Preview">X</span><script type="math/tex">X</script></span> and output <span class="arithmatex"><span class="MathJax_Preview">Y</span><script type="math/tex">Y</script></span>. The model is expressed as:</p>
-<div class="arithmatex">
-<div class="MathJax_Preview">
+<p>Linear regression assumes a <strong>linear relationship</strong> between the input <span class="arithmatex">\(X\)</span> and output <span class="arithmatex">\(Y\)</span>. The model is expressed as:</p>
+<div class="arithmatex">\[
 Y = \beta_0 + \beta_1 X + \epsilon
-</div>
-<script type="math/tex; mode=display">
-Y = \beta_0 + \beta_1 X + \epsilon
-</script>
-</div>
+\]</div>
 <p>where:</p>
 <ul>
 <li>
-<p><span class="arithmatex"><span class="MathJax_Preview">\beta_0</span><script type="math/tex">\beta_0</script></span> is the <strong>intercept</strong> (constant term).</p>
+<p><span class="arithmatex">\(\beta_0\)</span> is the <strong>intercept</strong> (constant term).</p>
 </li>
 <li>
-<p><span class="arithmatex"><span class="MathJax_Preview">\beta_1</span><script type="math/tex">\beta_1</script></span> is the <strong>coefficient</strong> (slope).</p>
+<p><span class="arithmatex">\(\beta_1\)</span> is the <strong>coefficient</strong> (slope).</p>
 </li>
 <li>
-<p><span class="arithmatex"><span class="MathJax_Preview">\epsilon</span><script type="math/tex">\epsilon</script></span> is the <strong>error term</strong> (captures noise or randomness in data).</p>
+<p><span class="arithmatex">\(\epsilon\)</span> is the <strong>error term</strong> (captures noise or randomness in data).</p>
 </li>
 </ul>
 <h4 id="key-assumptions"><strong>Key Assumptions:</strong></h4>
 <ol>
 <li>
-<p><strong>Linearity:</strong> The relationship between <span class="arithmatex"><span class="MathJax_Preview">X</span><script type="math/tex">X</script></span> and <span class="arithmatex"><span class="MathJax_Preview">Y</span><script type="math/tex">Y</script></span> is linear.</p>
+<p><strong>Linearity:</strong> The relationship between <span class="arithmatex">\(X\)</span> and <span class="arithmatex">\(Y\)</span> is linear.</p>
 </li>
 <li>
 <p><strong>Independence:</strong> Observations are independent.</p>
 </li>
 <li>
-<p><strong>Homoscedasticity:</strong> The variance of errors remains constant across values of <span class="arithmatex"><span class="MathJax_Preview">X</span><script type="math/tex">X</script></span>.</p>
+<p><strong>Homoscedasticity:</strong> The variance of errors remains constant across values of <span class="arithmatex">\(X\)</span>.</p>
 </li>
 <li>
 <p><strong>Normality of Errors:</strong> The residuals (errors) follow a normal distribution.</p>
@@ -1714,57 +1711,37 @@ Y = \beta_0 + \beta_1 X + \epsilon
 </ol>
 <h4 id="how-it-works"><strong>How It Works:</strong></h4>
 <p>Linear regression finds the <strong>best-fit line</strong> by minimizing the sum of squared errors, using <strong>Ordinary Least Squares (OLS)</strong>:</p>
-<div class="arithmatex">
-<div class="MathJax_Preview">
+<div class="arithmatex">\[
 \min_{\beta} \sum (Y_i - \hat{Y}_i)^2
-</div>
-<script type="math/tex; mode=display">
-\min_{\beta} \sum (Y_i - \hat{Y}_i)^2
-</script>
-</div>
-<p>where <span class="arithmatex"><span class="MathJax_Preview">\hat{Y}_i</span><script type="math/tex">\hat{Y}_i</script></span> is the predicted value.</p>
+\]</div>
+<p>where <span class="arithmatex">\(\hat{Y}_i\)</span> is the predicted value.</p>
 <hr />
 <h3 id="2-multiple-linear-regression"><strong>2. Multiple Linear Regression</strong></h3>
 <p>Extends linear regression to <strong>multiple features</strong>:</p>
-<div class="arithmatex">
-<div class="MathJax_Preview">
+<div class="arithmatex">\[
 Y = \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \cdots + \beta_n X_n + \epsilon
-</div>
-<script type="math/tex; mode=display">
-Y = \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \cdots + \beta_n X_n + \epsilon
-</script>
-</div>
+\]</div>
 <p>It captures the influence of multiple factors on the target variable.</p>
 <hr />
 <h3 id="3-logistic-regression-for-classification"><strong>3. Logistic Regression (For Classification)</strong></h3>
 <p>Despite the name, <strong>logistic regression is used for classification</strong>, not regression. It models the probability of a binary outcome:</p>
-<div class="arithmatex">
-<div class="MathJax_Preview">
+<div class="arithmatex">\[
 P(Y=1 | X) = \frac{1}{1 + e^{-(\beta_0 + \beta_1 X)}}
-</div>
-<script type="math/tex; mode=display">
-P(Y=1 | X) = \frac{1}{1 + e^{-(\beta_0 + \beta_1 X)}}
-</script>
-</div>
+\]</div>
 <ul>
 <li>
 <p>It uses the <strong>logit (sigmoid) function</strong> to map predictions between 0 and 1.</p>
 </li>
 <li>
-<p><strong>Generalized linear model (GLM)</strong>: It assumes a <strong>Bernoulli distribution</strong> for <span class="arithmatex"><span class="MathJax_Preview">Y</span><script type="math/tex">Y</script></span>.</p>
+<p><strong>Generalized linear model (GLM)</strong>: It assumes a <strong>Bernoulli distribution</strong> for <span class="arithmatex">\(Y\)</span>.</p>
 </li>
 </ul>
 <hr />
 <h3 id="4-polynomial-regression"><strong>4. Polynomial Regression</strong></h3>
 <p>If a relationship is <strong>non-linear</strong>, we extend linear regression to include polynomial terms:</p>
-<div class="arithmatex">
-<div class="MathJax_Preview">
+<div class="arithmatex">\[
 Y = \beta_0 + \beta_1 X + \beta_2 X^2 + \beta_3 X^3 + \dots + \beta_n X^n + \epsilon
-</div>
-<script type="math/tex; mode=display">
-Y = \beta_0 + \beta_1 X + \beta_2 X^2 + \beta_3 X^3 + \dots + \beta_n X^n + \epsilon
-</script>
-</div>
+\]</div>
 <ul>
 <li>
 <p>It models curves instead of straight lines.</p>
@@ -1778,44 +1755,39 @@ Y = \beta_0 + \beta_1 X + \beta_2 X^2 + \beta_3 X^3 + \dots + \beta_n X^n + \eps
 <p>A <strong>Generalized Linear Model (GLM)</strong> extends ordinary linear regression by allowing for:</p>
 <ol>
 <li>
-<p><strong>Different Distributions</strong>: The response variable <span class="arithmatex"><span class="MathJax_Preview">Y</span><script type="math/tex">Y</script></span> can follow different distributions (not just normal).</p>
+<p><strong>Different Distributions</strong>: The response variable <span class="arithmatex">\(Y\)</span> can follow different distributions (not just normal).</p>
 </li>
 <li>
-<p><strong>Link Function</strong>: Instead of modeling <span class="arithmatex"><span class="MathJax_Preview">Y</span><script type="math/tex">Y</script></span> directly, GLMs use a function to relate the mean <span class="arithmatex"><span class="MathJax_Preview">E[Y]</span><script type="math/tex">E[Y]</script></span> to the linear predictor.</p>
+<p><strong>Link Function</strong>: Instead of modeling <span class="arithmatex">\(Y\)</span> directly, GLMs use a function to relate the mean <span class="arithmatex">\(E[Y]\)</span> to the linear predictor.</p>
 </li>
 </ol>
 <h4 id="general-form-of-glm"><strong>General Form of GLM</strong></h4>
-<p>For a response variable <span class="arithmatex"><span class="MathJax_Preview">Y</span><script type="math/tex">Y</script></span>, GLMs assume:</p>
-<div class="arithmatex">
-<div class="MathJax_Preview">
+<p>For a response variable <span class="arithmatex">\(Y\)</span>, GLMs assume:</p>
+<div class="arithmatex">\[
 g(E[Y]) = X\beta
-</div>
-<script type="math/tex; mode=display">
-g(E[Y]) = X\beta
-</script>
-</div>
+\]</div>
 <p>Where:</p>
 <ul>
 <li>
-<p><span class="arithmatex"><span class="MathJax_Preview">X</span><script type="math/tex">X</script></span> is the matrix of input features.</p>
+<p><span class="arithmatex">\(X\)</span> is the matrix of input features.</p>
 </li>
 <li>
-<p><span class="arithmatex"><span class="MathJax_Preview">\beta</span><script type="math/tex">\beta</script></span> are the coefficients to learn.</p>
+<p><span class="arithmatex">\(\beta\)</span> are the coefficients to learn.</p>
 </li>
 <li>
-<p><span class="arithmatex"><span class="MathJax_Preview">g(\cdot)</span><script type="math/tex">g(\cdot)</script></span> is the <strong>link function</strong>, which connects the expected value of <span class="arithmatex"><span class="MathJax_Preview">Y</span><script type="math/tex">Y</script></span> to a linear combination of inputs.</p>
+<p><span class="arithmatex">\(g(\cdot)\)</span> is the <strong>link function</strong>, which connects the expected value of <span class="arithmatex">\(Y\)</span> to a linear combination of inputs.</p>
 </li>
 </ul>
 <h4 id="key-components-of-glm"><strong>Key Components of GLM</strong></h4>
 <ol>
 <li>
-<p><strong>Exponential Family of Distributions</strong>: <span class="arithmatex"><span class="MathJax_Preview">Y</span><script type="math/tex">Y</script></span> comes from a family of distributions (Normal, Poisson, Binomial, etc.).</p>
+<p><strong>Exponential Family of Distributions</strong>: <span class="arithmatex">\(Y\)</span> comes from a family of distributions (Normal, Poisson, Binomial, etc.).</p>
 </li>
 <li>
-<p><strong>Link Function</strong> <span class="arithmatex"><span class="MathJax_Preview">g(\cdot)</span><script type="math/tex">g(\cdot)</script></span>: Transforms <span class="arithmatex"><span class="MathJax_Preview">E[Y]</span><script type="math/tex">E[Y]</script></span> into a linear model.</p>
+<p><strong>Link Function</strong> <span class="arithmatex">\(g(\cdot)\)</span>: Transforms <span class="arithmatex">\(E[Y]\)</span> into a linear model.</p>
 </li>
 <li>
-<p><strong>Linear Predictor</strong>: <span class="arithmatex"><span class="MathJax_Preview">X\beta</span><script type="math/tex">X\beta</script></span> remains a linear combination of inputs.</p>
+<p><strong>Linear Predictor</strong>: <span class="arithmatex">\(X\beta\)</span> remains a linear combination of inputs.</p>
 </li>
 </ol>
 <h4 id="why-glms"><strong>Why GLMs?</strong></h4>
@@ -1836,115 +1808,95 @@ g(E[Y]) = X\beta
 <ol>
 <li>
 <p><strong>Mean Squared Error (MSE):</strong> Measures average squared differences between actual and predicted values.</p>
-<div class="arithmatex">
-<div class="MathJax_Preview">  
+<div class="arithmatex">\[  
 MSE = \frac{1}{n} \sum (Y_i - \hat{Y}_i)^2  
-</div>
-<script type="math/tex; mode=display">  
-MSE = \frac{1}{n} \sum (Y_i - \hat{Y}_i)^2  
-</script>
-</div>
+\]</div>
 </li>
 <li>
 <p><strong>Root Mean Squared Error (RMSE):</strong> Square root of MSE, which brings errors to the same unit as the data.</p>
-<div class="arithmatex">
-<div class="MathJax_Preview">
+<div class="arithmatex">\[
 RMSE = \sqrt{MSE}
-</div>
-<script type="math/tex; mode=display">
-RMSE = \sqrt{MSE}
-</script>
-</div>
+\]</div>
 </li>
 <li>
 <p><strong>Mean Absolute Error (MAE):</strong> Measures the average absolute differences.</p>
-<div class="arithmatex">
-<div class="MathJax_Preview">
+<div class="arithmatex">\[
 MAE = \frac{1}{n} \sum |Y_i - \hat{Y}_i|
-</div>
-<script type="math/tex; mode=display">
-MAE = \frac{1}{n} \sum |Y_i - \hat{Y}_i|
-</script>
-</div>
+\]</div>
 </li>
 <li>
-<p><strong><span class="arithmatex"><span class="MathJax_Preview">R^2</span><script type="math/tex">R^2</script></span> (Coefficient of Determination):</strong> Explains the proportion of variance explained by the model.</p>
-<div class="arithmatex">
-<div class="MathJax_Preview">
+<p><strong><span class="arithmatex">\(R^2\)</span> (Coefficient of Determination):</strong> Explains the proportion of variance explained by the model.</p>
+<div class="arithmatex">\[
 R^2 = 1 - \frac{\sum (Y_i - \hat{Y}_i)^2}{\sum (Y_i - \bar{Y})^2}
-</div>
-<script type="math/tex; mode=display">
-R^2 = 1 - \frac{\sum (Y_i - \hat{Y}_i)^2}{\sum (Y_i - \bar{Y})^2}
-</script>
-</div>
+\]</div>
 <hr />
 </li>
 </ol>
-<div class="highlight"><table class="highlighttable"><tr><th colspan="2" class="filename"><span class="filename">Python</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-1-1"> 1</a></span>
-<span class="normal"><a href="#__codelineno-1-2"> 2</a></span>
-<span class="normal"><a href="#__codelineno-1-3"> 3</a></span>
-<span class="normal"><a href="#__codelineno-1-4"> 4</a></span>
-<span class="normal"><a href="#__codelineno-1-5"> 5</a></span>
-<span class="normal"><a href="#__codelineno-1-6"> 6</a></span>
-<span class="normal"><a href="#__codelineno-1-7"> 7</a></span>
-<span class="normal"><a href="#__codelineno-1-8"> 8</a></span>
-<span class="normal"><a href="#__codelineno-1-9"> 9</a></span>
-<span class="normal"><a href="#__codelineno-1-10">10</a></span>
-<span class="normal"><a href="#__codelineno-1-11">11</a></span>
-<span class="normal"><a href="#__codelineno-1-12">12</a></span>
-<span class="normal"><a href="#__codelineno-1-13">13</a></span>
-<span class="normal"><a href="#__codelineno-1-14">14</a></span>
-<span class="normal"><a href="#__codelineno-1-15">15</a></span>
-<span class="normal"><a href="#__codelineno-1-16">16</a></span>
-<span class="normal"><a href="#__codelineno-1-17">17</a></span>
-<span class="normal"><a href="#__codelineno-1-18">18</a></span>
-<span class="normal"><a href="#__codelineno-1-19">19</a></span>
-<span class="normal"><a href="#__codelineno-1-20">20</a></span>
-<span class="normal"><a href="#__codelineno-1-21">21</a></span>
-<span class="normal"><a href="#__codelineno-1-22">22</a></span>
-<span class="normal"><a href="#__codelineno-1-23">23</a></span>
-<span class="normal"><a href="#__codelineno-1-24">24</a></span>
-<span class="normal"><a href="#__codelineno-1-25">25</a></span>
-<span class="normal"><a href="#__codelineno-1-26">26</a></span>
-<span class="normal"><a href="#__codelineno-1-27">27</a></span>
-<span class="normal"><a href="#__codelineno-1-28">28</a></span>
-<span class="normal"><a href="#__codelineno-1-29">29</a></span>
-<span class="normal"><a href="#__codelineno-1-30">30</a></span>
-<span class="normal"><a href="#__codelineno-1-31">31</a></span>
-<span class="normal"><a href="#__codelineno-1-32">32</a></span>
-<span class="normal"><a href="#__codelineno-1-33">33</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1"></a><span class="c1"># the linear model</span>
-<a id="__codelineno-1-2" name="__codelineno-1-2"></a><span class="k">def</span> <span class="nf">linear</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
-<a id="__codelineno-1-3" name="__codelineno-1-3"></a>    <span class="n">w</span><span class="p">,</span><span class="n">b</span> <span class="o">=</span> <span class="n">params</span>
-<a id="__codelineno-1-4" name="__codelineno-1-4"></a>    <span class="k">return</span> <span class="n">w</span><span class="o">*</span><span class="n">x</span> <span class="o">+</span> <span class="n">b</span>
-<a id="__codelineno-1-5" name="__codelineno-1-5"></a>
-<a id="__codelineno-1-6" name="__codelineno-1-6"></a><span class="k">def</span> <span class="nf">loss</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">dataset</span><span class="p">):</span>
-<a id="__codelineno-1-7" name="__codelineno-1-7"></a>    <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">dataset</span>
-<a id="__codelineno-1-8" name="__codelineno-1-8"></a>    <span class="n">pred</span> <span class="o">=</span> <span class="n">linear</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
-<a id="__codelineno-1-9" name="__codelineno-1-9"></a>    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">square</span><span class="p">(</span><span class="n">pred</span> <span class="o">-</span> <span class="n">y</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
-<a id="__codelineno-1-10" name="__codelineno-1-10"></a>
-<a id="__codelineno-1-11" name="__codelineno-1-11"></a><span class="c1"># gradient function</span>
-<a id="__codelineno-1-12" name="__codelineno-1-12"></a><span class="n">loss_grad</span> <span class="o">=</span> <span class="n">grad</span><span class="p">(</span><span class="n">loss</span><span class="p">)</span>
-<a id="__codelineno-1-13" name="__codelineno-1-13"></a>
-<a id="__codelineno-1-14" name="__codelineno-1-14"></a><span class="n">iterations</span> <span class="o">=</span> <span class="mi">500</span>
-<a id="__codelineno-1-15" name="__codelineno-1-15"></a><span class="n">step_size</span> <span class="o">=</span> <span class="mf">0.1</span>
-<a id="__codelineno-1-16" name="__codelineno-1-16"></a><span class="n">dataset</span> <span class="o">=</span> <span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">)</span>
-<a id="__codelineno-1-17" name="__codelineno-1-17"></a><span class="n">w</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="mf">1.5</span><span class="p">,</span> <span class="mf">2.</span> <span class="c1"># initial values for the parameters</span>
-<a id="__codelineno-1-18" name="__codelineno-1-18"></a><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">iterations</span><span class="p">):</span>
-<a id="__codelineno-1-19" name="__codelineno-1-19"></a>    <span class="n">params</span> <span class="o">=</span> <span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
-<a id="__codelineno-1-20" name="__codelineno-1-20"></a>    <span class="n">loss_</span> <span class="o">=</span> <span class="n">loss</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">dataset</span><span class="p">)</span>
-<a id="__codelineno-1-21" name="__codelineno-1-21"></a>    <span class="c1"># compute gradient w.r.t model parameters</span>
-<a id="__codelineno-1-22" name="__codelineno-1-22"></a>    <span class="n">params_grad</span> <span class="o">=</span> <span class="n">loss_grad</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">dataset</span><span class="p">)</span>
-<a id="__codelineno-1-23" name="__codelineno-1-23"></a>    <span class="c1"># update parameters</span>
-<a id="__codelineno-1-24" name="__codelineno-1-24"></a>    <span class="n">w</span> <span class="o">-=</span> <span class="n">step_size</span> <span class="o">*</span> <span class="n">params_grad</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-<a id="__codelineno-1-25" name="__codelineno-1-25"></a>    <span class="n">b</span> <span class="o">-=</span> <span class="n">step_size</span> <span class="o">*</span> <span class="n">params_grad</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-<a id="__codelineno-1-26" name="__codelineno-1-26"></a>    <span class="c1">#print(loss_)</span>
-<a id="__codelineno-1-27" name="__codelineno-1-27"></a>
-<a id="__codelineno-1-28" name="__codelineno-1-28"></a><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;loss: </span><span class="si">{}</span><span class="s2">, params </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">loss_</span><span class="p">,</span> <span class="n">params</span><span class="p">))</span>
-<a id="__codelineno-1-29" name="__codelineno-1-29"></a>
-<a id="__codelineno-1-30" name="__codelineno-1-30"></a><span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;blue&#39;</span><span class="p">)</span>
-<a id="__codelineno-1-31" name="__codelineno-1-31"></a><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">X</span><span class="p">),</span>  <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">X</span><span class="p">)</span><span class="o">*</span><span class="n">true_w</span> <span class="o">+</span> <span class="n">true_b</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">X</span><span class="p">)),</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">)</span>
-<a id="__codelineno-1-32" name="__codelineno-1-32"></a><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">X</span><span class="p">),</span> <span class="n">linear</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">X</span><span class="p">)),</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">)</span>
-<a id="__codelineno-1-33" name="__codelineno-1-33"></a><span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<div class="highlight"><table class="highlighttable"><tr><th colspan="2" class="filename"><span class="filename">Python</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span>
+<span class="normal">19</span>
+<span class="normal">20</span>
+<span class="normal">21</span>
+<span class="normal">22</span>
+<span class="normal">23</span>
+<span class="normal">24</span>
+<span class="normal">25</span>
+<span class="normal">26</span>
+<span class="normal">27</span>
+<span class="normal">28</span>
+<span class="normal">29</span>
+<span class="normal">30</span>
+<span class="normal">31</span>
+<span class="normal">32</span>
+<span class="normal">33</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="c1"># the linear model</span>
+<span class="k">def</span> <span class="nf">linear</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+    <span class="n">w</span><span class="p">,</span><span class="n">b</span> <span class="o">=</span> <span class="n">params</span>
+    <span class="k">return</span> <span class="n">w</span><span class="o">*</span><span class="n">x</span> <span class="o">+</span> <span class="n">b</span>
+
+<span class="k">def</span> <span class="nf">loss</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">dataset</span><span class="p">):</span>
+    <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">dataset</span>
+    <span class="n">pred</span> <span class="o">=</span> <span class="n">linear</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">square</span><span class="p">(</span><span class="n">pred</span> <span class="o">-</span> <span class="n">y</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+
+<span class="c1"># gradient function</span>
+<span class="n">loss_grad</span> <span class="o">=</span> <span class="n">grad</span><span class="p">(</span><span class="n">loss</span><span class="p">)</span>
+
+<span class="n">iterations</span> <span class="o">=</span> <span class="mi">500</span>
+<span class="n">step_size</span> <span class="o">=</span> <span class="mf">0.1</span>
+<span class="n">dataset</span> <span class="o">=</span> <span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">)</span>
+<span class="n">w</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="mf">1.5</span><span class="p">,</span> <span class="mf">2.</span> <span class="c1"># initial values for the parameters</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">iterations</span><span class="p">):</span>
+    <span class="n">params</span> <span class="o">=</span> <span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+    <span class="n">loss_</span> <span class="o">=</span> <span class="n">loss</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">dataset</span><span class="p">)</span>
+    <span class="c1"># compute gradient w.r.t model parameters</span>
+    <span class="n">params_grad</span> <span class="o">=</span> <span class="n">loss_grad</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">dataset</span><span class="p">)</span>
+    <span class="c1"># update parameters</span>
+    <span class="n">w</span> <span class="o">-=</span> <span class="n">step_size</span> <span class="o">*</span> <span class="n">params_grad</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">b</span> <span class="o">-=</span> <span class="n">step_size</span> <span class="o">*</span> <span class="n">params_grad</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="c1">#print(loss_)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;loss: </span><span class="si">{}</span><span class="s2">, params </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">loss_</span><span class="p">,</span> <span class="n">params</span><span class="p">))</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;blue&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">X</span><span class="p">),</span>  <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">X</span><span class="p">)</span><span class="o">*</span><span class="n">true_w</span> <span class="o">+</span> <span class="n">true_b</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">X</span><span class="p">)),</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">X</span><span class="p">),</span> <span class="n">linear</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">X</span><span class="p">)),</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </code></pre></div></td></tr></table></div>
 <blockquote>
 <p>loss: 0.25392094254493713,<br />
@@ -1987,11 +1939,11 @@ params (Array(0.26151434, dtype=float32, weak_type=True), Array(1.8786527, dtype
 <p>VC dimension is a fundamental concept in statistical learning theory that measures the <strong>capacity</strong> or <strong>complexity</strong> of a model class. It quantifies how well a model can <strong>shatter</strong> (perfectly classify) different sets of data points.</p>
 <blockquote>
 <p>[!Definition]<br />
-The <strong>VC dimension</strong> of a hypothesis class <span class="arithmatex"><span class="MathJax_Preview">\mathcal{H}</span><script type="math/tex">\mathcal{H}</script></span> is the largest number of points that can be <strong>shattered</strong> by some hypothesis in <span class="arithmatex"><span class="MathJax_Preview">\mathcal{H}</span><script type="math/tex">\mathcal{H}</script></span>.</p>
+The <strong>VC dimension</strong> of a hypothesis class <span class="arithmatex">\(\mathcal{H}\)</span> is the largest number of points that can be <strong>shattered</strong> by some hypothesis in <span class="arithmatex">\(\mathcal{H}\)</span>.</p>
 </blockquote>
 <ul>
 <li>
-<p>A model <strong>shatters</strong> a dataset if it can classify all possible labelings (all <span class="arithmatex"><span class="MathJax_Preview">2^n</span><script type="math/tex">2^n</script></span> assignments of class labels for <span class="arithmatex"><span class="MathJax_Preview">n</span><script type="math/tex">n</script></span> points).</p>
+<p>A model <strong>shatters</strong> a dataset if it can classify all possible labelings (all <span class="arithmatex">\(2^n\)</span> assignments of class labels for <span class="arithmatex">\(n\)</span> points).</p>
 </li>
 <li>
 <p>Higher VC dimension → More complex model → Higher capacity to fit data (risk of overfitting).</p>
@@ -2003,7 +1955,7 @@ The <strong>VC dimension</strong> of a hypothesis class <span class="arithmatex"
 <p>A linear classifier in 2D can <strong>shatter</strong> at most <strong>3</strong> points, so its VC dimension is 3.</p>
 </li>
 <li>
-<p>A linear classifier in <span class="arithmatex"><span class="MathJax_Preview">d</span><script type="math/tex">d</script></span>-dimensions has VC dimension <span class="arithmatex"><span class="MathJax_Preview">d+1</span><script type="math/tex">d+1</script></span>.</p>
+<p>A linear classifier in <span class="arithmatex">\(d\)</span>-dimensions has VC dimension <span class="arithmatex">\(d+1\)</span>.</p>
 </li>
 </ul>
 </li>
@@ -2017,7 +1969,7 @@ The <strong>VC dimension</strong> of a hypothesis class <span class="arithmatex"
 <p><strong>Higher VC dimension</strong> → Model is complex (overfitting risk).</p>
 </li>
 <li>
-<p><strong>VC Theorem</strong>: If a model has a finite VC dimension <span class="arithmatex"><span class="MathJax_Preview">d</span><script type="math/tex">d</script></span>, it generalizes well if the number of training examples <span class="arithmatex"><span class="MathJax_Preview">n</span><script type="math/tex">n</script></span> is sufficiently larger than <span class="arithmatex"><span class="MathJax_Preview">d</span><script type="math/tex">d</script></span>.</p>
+<p><strong>VC Theorem</strong>: If a model has a finite VC dimension <span class="arithmatex">\(d\)</span>, it generalizes well if the number of training examples <span class="arithmatex">\(n\)</span> is sufficiently larger than <span class="arithmatex">\(d\)</span>.</p>
 </li>
 </ul>
 <hr />
@@ -2057,61 +2009,61 @@ The <strong>VC dimension</strong> of a hypothesis class <span class="arithmatex"
 </li>
 <li>
 <p>Use <strong>nonlinear models</strong> (e.g., random forests, neural networks).
-<div class="highlight"><table class="highlighttable"><tr><th colspan="2" class="filename"><span class="filename">Python</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-2-1"> 1</a></span>
-<span class="normal"><a href="#__codelineno-2-2"> 2</a></span>
-<span class="normal"><a href="#__codelineno-2-3"> 3</a></span>
-<span class="normal"><a href="#__codelineno-2-4"> 4</a></span>
-<span class="normal"><a href="#__codelineno-2-5"> 5</a></span>
-<span class="normal"><a href="#__codelineno-2-6"> 6</a></span>
-<span class="normal"><a href="#__codelineno-2-7"> 7</a></span>
-<span class="normal"><a href="#__codelineno-2-8"> 8</a></span>
-<span class="normal"><a href="#__codelineno-2-9"> 9</a></span>
-<span class="normal"><a href="#__codelineno-2-10">10</a></span>
-<span class="normal"><a href="#__codelineno-2-11">11</a></span>
-<span class="normal"><a href="#__codelineno-2-12">12</a></span>
-<span class="normal"><a href="#__codelineno-2-13">13</a></span>
-<span class="normal"><a href="#__codelineno-2-14">14</a></span>
-<span class="normal"><a href="#__codelineno-2-15">15</a></span>
-<span class="normal"><a href="#__codelineno-2-16">16</a></span>
-<span class="normal"><a href="#__codelineno-2-17">17</a></span>
-<span class="normal"><a href="#__codelineno-2-18">18</a></span>
-<span class="normal"><a href="#__codelineno-2-19">19</a></span>
-<span class="normal"><a href="#__codelineno-2-20">20</a></span>
-<span class="normal"><a href="#__codelineno-2-21">21</a></span>
-<span class="normal"><a href="#__codelineno-2-22">22</a></span>
-<span class="normal"><a href="#__codelineno-2-23">23</a></span>
-<span class="normal"><a href="#__codelineno-2-24">24</a></span>
-<span class="normal"><a href="#__codelineno-2-25">25</a></span>
-<span class="normal"><a href="#__codelineno-2-26">26</a></span>
-<span class="normal"><a href="#__codelineno-2-27">27</a></span>
-<span class="normal"><a href="#__codelineno-2-28">28</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1"></a><span class="c1"># the nonlinear model</span>
-<a id="__codelineno-2-2" name="__codelineno-2-2"></a><span class="k">def</span> <span class="nf">nonlinear</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
-<a id="__codelineno-2-3" name="__codelineno-2-3"></a>    <span class="n">res</span> <span class="o">=</span> <span class="mf">0.0</span>
-<a id="__codelineno-2-4" name="__codelineno-2-4"></a>    <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">weight</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">params</span><span class="p">):</span>
-<a id="__codelineno-2-5" name="__codelineno-2-5"></a>        <span class="n">res</span> <span class="o">+=</span> <span class="n">weight</span> <span class="o">*</span> <span class="n">x</span> <span class="o">**</span> <span class="n">idx</span>
-<a id="__codelineno-2-6" name="__codelineno-2-6"></a>    <span class="k">return</span> <span class="n">res</span>
-<a id="__codelineno-2-7" name="__codelineno-2-7"></a>
-<a id="__codelineno-2-8" name="__codelineno-2-8"></a><span class="k">def</span> <span class="nf">loss</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">dataset</span><span class="p">):</span>
-<a id="__codelineno-2-9" name="__codelineno-2-9"></a>    <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">dataset</span>
-<a id="__codelineno-2-10" name="__codelineno-2-10"></a>    <span class="n">pred</span> <span class="o">=</span> <span class="n">nonlinear</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
-<a id="__codelineno-2-11" name="__codelineno-2-11"></a>    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">square</span><span class="p">(</span><span class="n">pred</span> <span class="o">-</span> <span class="n">y</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
-<a id="__codelineno-2-12" name="__codelineno-2-12"></a>
-<a id="__codelineno-2-13" name="__codelineno-2-13"></a><span class="c1"># gradient function</span>
-<a id="__codelineno-2-14" name="__codelineno-2-14"></a><span class="n">loss_grad</span> <span class="o">=</span> <span class="n">grad</span><span class="p">(</span><span class="n">loss</span><span class="p">)</span>
-<a id="__codelineno-2-15" name="__codelineno-2-15"></a>
-<a id="__codelineno-2-16" name="__codelineno-2-16"></a><span class="n">dataset</span> <span class="o">=</span> <span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">)</span>
-<a id="__codelineno-2-17" name="__codelineno-2-17"></a><span class="k">for</span> <span class="n">order</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="mi">2</span><span class="p">):</span>
-<a id="__codelineno-2-18" name="__codelineno-2-18"></a>    <span class="n">weights</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">order</span><span class="p">)</span> <span class="o">*</span> <span class="mf">1.5</span> 
-<a id="__codelineno-2-19" name="__codelineno-2-19"></a>
-<a id="__codelineno-2-20" name="__codelineno-2-20"></a>    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">iterations</span><span class="p">):</span>
-<a id="__codelineno-2-21" name="__codelineno-2-21"></a>        <span class="n">params</span> <span class="o">=</span> <span class="n">weights</span>
-<a id="__codelineno-2-22" name="__codelineno-2-22"></a>        <span class="n">loss_</span> <span class="o">=</span> <span class="n">loss</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">dataset</span><span class="p">)</span>
-<a id="__codelineno-2-23" name="__codelineno-2-23"></a>        <span class="n">params_grad</span> <span class="o">=</span> <span class="n">loss_grad</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">dataset</span><span class="p">)</span>
-<a id="__codelineno-2-24" name="__codelineno-2-24"></a>        <span class="c1"># update parameters</span>
-<a id="__codelineno-2-25" name="__codelineno-2-25"></a>        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">order</span><span class="p">):</span>
-<a id="__codelineno-2-26" name="__codelineno-2-26"></a>            <span class="n">weights</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">weights</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">-</span> <span class="n">step_size</span> <span class="o">*</span> <span class="n">params_grad</span><span class="p">[</span><span class="n">j</span><span class="p">])</span>
-<a id="__codelineno-2-27" name="__codelineno-2-27"></a>
-<a id="__codelineno-2-28" name="__codelineno-2-28"></a>    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Order: </span><span class="si">{}</span><span class="s2">, loss: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">order</span><span class="p">,</span> <span class="n">loss_</span><span class="p">))</span>
+<div class="highlight"><table class="highlighttable"><tr><th colspan="2" class="filename"><span class="filename">Python</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span>
+<span class="normal">19</span>
+<span class="normal">20</span>
+<span class="normal">21</span>
+<span class="normal">22</span>
+<span class="normal">23</span>
+<span class="normal">24</span>
+<span class="normal">25</span>
+<span class="normal">26</span>
+<span class="normal">27</span>
+<span class="normal">28</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="c1"># the nonlinear model</span>
+<span class="k">def</span> <span class="nf">nonlinear</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+    <span class="n">res</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">weight</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">params</span><span class="p">):</span>
+        <span class="n">res</span> <span class="o">+=</span> <span class="n">weight</span> <span class="o">*</span> <span class="n">x</span> <span class="o">**</span> <span class="n">idx</span>
+    <span class="k">return</span> <span class="n">res</span>
+
+<span class="k">def</span> <span class="nf">loss</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">dataset</span><span class="p">):</span>
+    <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">dataset</span>
+    <span class="n">pred</span> <span class="o">=</span> <span class="n">nonlinear</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">square</span><span class="p">(</span><span class="n">pred</span> <span class="o">-</span> <span class="n">y</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+
+<span class="c1"># gradient function</span>
+<span class="n">loss_grad</span> <span class="o">=</span> <span class="n">grad</span><span class="p">(</span><span class="n">loss</span><span class="p">)</span>
+
+<span class="n">dataset</span> <span class="o">=</span> <span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">order</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="mi">2</span><span class="p">):</span>
+    <span class="n">weights</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">order</span><span class="p">)</span> <span class="o">*</span> <span class="mf">1.5</span> 
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">iterations</span><span class="p">):</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="n">weights</span>
+        <span class="n">loss_</span> <span class="o">=</span> <span class="n">loss</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">dataset</span><span class="p">)</span>
+        <span class="n">params_grad</span> <span class="o">=</span> <span class="n">loss_grad</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">dataset</span><span class="p">)</span>
+        <span class="c1"># update parameters</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">order</span><span class="p">):</span>
+            <span class="n">weights</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">weights</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">-</span> <span class="n">step_size</span> <span class="o">*</span> <span class="n">params_grad</span><span class="p">[</span><span class="n">j</span><span class="p">])</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Order: </span><span class="si">{}</span><span class="s2">, loss: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">order</span><span class="p">,</span> <span class="n">loss_</span><span class="p">))</span>
 </code></pre></div></td></tr></table></div></p>
 </li>
 </ul>
@@ -2128,10 +2080,10 @@ Order: 14, loss: 0.15189</p>
 <h3 id="c-regularization-avoid-overfitting"><strong>C. Regularization (Avoid Overfitting)</strong></h3>
 <ul>
 <li>
-<p><strong>L1 Regularization (Lasso <span class="arithmatex"><span class="MathJax_Preview">\ell_1</span><script type="math/tex">\ell_1</script></span>)</strong>: Encourages sparsity (feature selection).</p>
+<p><strong>L1 Regularization (Lasso <span class="arithmatex">\(\ell_1\)</span>)</strong>: Encourages sparsity (feature selection).</p>
 </li>
 <li>
-<p><strong>L2 Regularization (<span class="arithmatex"><span class="MathJax_Preview">\ell_2</span><script type="math/tex">\ell_2</script></span> Ridge)</strong>: Reduces large weights, preventing overfitting.</p>
+<p><strong>L2 Regularization (<span class="arithmatex">\(\ell_2\)</span> Ridge)</strong>: Reduces large weights, preventing overfitting.</p>
 </li>
 <li>
 <p><strong>Elastic Net</strong>: Combination of L1 and L2.</p>
@@ -2145,58 +2097,53 @@ Order: 14, loss: 0.15189</p>
 </ul>
 <hr />
 <h4 id="ridge-regressionl2-regulation">Ridge regression(L2 regulation)</h4>
-<div class="highlight"><table class="highlighttable"><tr><th colspan="2" class="filename"><span class="filename">Python</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-3-1"> 1</a></span>
-<span class="normal"><a href="#__codelineno-3-2"> 2</a></span>
-<span class="normal"><a href="#__codelineno-3-3"> 3</a></span>
-<span class="normal"><a href="#__codelineno-3-4"> 4</a></span>
-<span class="normal"><a href="#__codelineno-3-5"> 5</a></span>
-<span class="normal"><a href="#__codelineno-3-6"> 6</a></span>
-<span class="normal"><a href="#__codelineno-3-7"> 7</a></span>
-<span class="normal"><a href="#__codelineno-3-8"> 8</a></span>
-<span class="normal"><a href="#__codelineno-3-9"> 9</a></span>
-<span class="normal"><a href="#__codelineno-3-10">10</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1"></a><span class="kn">from</span> <span class="nn">sklearn</span> <span class="kn">import</span> <span class="n">linear_model</span>
-<a id="__codelineno-3-2" name="__codelineno-3-2"></a>
-<a id="__codelineno-3-3" name="__codelineno-3-3"></a><span class="n">idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
-<a id="__codelineno-3-4" name="__codelineno-3-4"></a>
-<a id="__codelineno-3-5" name="__codelineno-3-5"></a><span class="c1"># encoder</span>
-<a id="__codelineno-3-6" name="__codelineno-3-6"></a><span class="n">Z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">X</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span><span class="o">**</span><span class="n">n</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">)],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-<a id="__codelineno-3-7" name="__codelineno-3-7"></a>
-<a id="__codelineno-3-8" name="__codelineno-3-8"></a><span class="c1"># ridge regression</span>
-<a id="__codelineno-3-9" name="__codelineno-3-9"></a><span class="n">reg</span> <span class="o">=</span> <span class="n">linear_model</span><span class="o">.</span><span class="n">Ridge</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">)</span>
-<a id="__codelineno-3-10" name="__codelineno-3-10"></a><span class="n">reg</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">Z</span><span class="p">,</span> <span class="n">Y</span><span class="p">[</span><span class="n">idx</span><span class="p">])</span>
+<div class="highlight"><table class="highlighttable"><tr><th colspan="2" class="filename"><span class="filename">Python</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="kn">from</span> <span class="nn">sklearn</span> <span class="kn">import</span> <span class="n">linear_model</span>
+
+<span class="n">idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+
+<span class="c1"># encoder</span>
+<span class="n">Z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">X</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span><span class="o">**</span><span class="n">n</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">)],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="c1"># ridge regression</span>
+<span class="n">reg</span> <span class="o">=</span> <span class="n">linear_model</span><span class="o">.</span><span class="n">Ridge</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">)</span>
+<span class="n">reg</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">Z</span><span class="p">,</span> <span class="n">Y</span><span class="p">[</span><span class="n">idx</span><span class="p">])</span>
 </code></pre></div></td></tr></table></div>
 <blockquote>
 <p>Mean Squared Error (Loss): 0.04097932204604149</p>
 </blockquote>
 <p><img alt="image.png" src="https://raw.githubusercontent.com/leon2milan/FigureBed/master/20250219154350.png" /></p>
-<p><strong>Ridge regression</strong> is a type of <strong>linear regression</strong> that includes an <span class="arithmatex"><span class="MathJax_Preview">L_2</span><script type="math/tex">L_2</script></span>-norm penalty to prevent overfitting. The objective function is:</p>
-<div class="arithmatex">
-<div class="MathJax_Preview">
+<p><strong>Ridge regression</strong> is a type of <strong>linear regression</strong> that includes an <span class="arithmatex">\(L_2\)</span>-norm penalty to prevent overfitting. The objective function is:</p>
+<div class="arithmatex">\[
 \min_{\beta} \sum_{i=1}^{n} (y_i - X_i \beta)^2 + \lambda \sum_{j=1}^{p} \beta_j^2
-</div>
-<script type="math/tex; mode=display">
-\min_{\beta} \sum_{i=1}^{n} (y_i - X_i \beta)^2 + \lambda \sum_{j=1}^{p} \beta_j^2
-</script>
-</div>
+\]</div>
 <p>where:</p>
 <ul>
 <li>
-<p><span class="arithmatex"><span class="MathJax_Preview">y_i</span><script type="math/tex">y_i</script></span> are the observed values,</p>
+<p><span class="arithmatex">\(y_i\)</span> are the observed values,</p>
 </li>
 <li>
-<p><span class="arithmatex"><span class="MathJax_Preview">X_i</span><script type="math/tex">X_i</script></span> are the input features,</p>
+<p><span class="arithmatex">\(X_i\)</span> are the input features,</p>
 </li>
 <li>
-<p><span class="arithmatex"><span class="MathJax_Preview">\beta</span><script type="math/tex">\beta</script></span> are the regression coefficients,</p>
+<p><span class="arithmatex">\(\beta\)</span> are the regression coefficients,</p>
 </li>
 <li>
-<p><span class="arithmatex"><span class="MathJax_Preview">\lambda</span><script type="math/tex">\lambda</script></span> is the <strong>regularization parameter</strong>, which controls the trade-off between fitting the data and keeping coefficients small.</p>
+<p><span class="arithmatex">\(\lambda\)</span> is the <strong>regularization parameter</strong>, which controls the trade-off between fitting the data and keeping coefficients small.</p>
 </li>
 </ul>
 <h4 id="intuition"><strong>Intuition:</strong></h4>
 <ul>
 <li>
-<p>Adding <span class="arithmatex"><span class="MathJax_Preview">\lambda \sum \beta_j^2</span><script type="math/tex">\lambda \sum \beta_j^2</script></span> <strong>shrinks</strong> the coefficients <span class="arithmatex"><span class="MathJax_Preview">\beta_j</span><script type="math/tex">\beta_j</script></span> towards zero but <strong>never exactly zero</strong>.</p>
+<p>Adding <span class="arithmatex">\(\lambda \sum \beta_j^2\)</span> <strong>shrinks</strong> the coefficients <span class="arithmatex">\(\beta_j\)</span> towards zero but <strong>never exactly zero</strong>.</p>
 </li>
 <li>
 <p>Ridge regression helps when features are <strong>highly correlated</strong>, reducing variance and preventing overfitting.</p>
@@ -2207,41 +2154,36 @@ Order: 14, loss: 0.15189</p>
 <p>$$</p>
 <p>\beta_j \sim \mathcal{N}(0, \tau^2)</p>
 <p>$$</p>
-<p>where <span class="arithmatex"><span class="MathJax_Preview">\tau^2 = \frac{1}{\lambda}</span><script type="math/tex">\tau^2 = \frac{1}{\lambda}</script></span>. This means:</p>
+<p>where <span class="arithmatex">\(\tau^2 = \frac{1}{\lambda}\)</span>. This means:</p>
 <ul>
 <li>
 <p>The model assumes that <strong>larger coefficients are less likely</strong>, which enforces shrinkage.</p>
 </li>
 <li>
-<p>A <strong>stronger prior (larger <span class="arithmatex"><span class="MathJax_Preview">\lambda</span><script type="math/tex">\lambda</script></span>)</strong> shrinks the coefficients more.</p>
+<p>A <strong>stronger prior (larger <span class="arithmatex">\(\lambda\)</span>)</strong> shrinks the coefficients more.</p>
 </li>
 </ul>
 <hr />
 <h4 id="lasso-regressionl1-regulation">Lasso Regression(L1 Regulation)</h4>
-<div class="highlight"><table class="highlighttable"><tr><th colspan="2" class="filename"><span class="filename">Python</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-4-1">1</a></span>
-<span class="normal"><a href="#__codelineno-4-2">2</a></span>
-<span class="normal"><a href="#__codelineno-4-3">3</a></span>
-<span class="normal"><a href="#__codelineno-4-4">4</a></span>
-<span class="normal"><a href="#__codelineno-4-5">5</a></span>
-<span class="normal"><a href="#__codelineno-4-6">6</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1"></a><span class="n">reg</span> <span class="o">=</span> <span class="n">linear_model</span><span class="o">.</span><span class="n">Lasso</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">)</span>
-<a id="__codelineno-4-2" name="__codelineno-4-2"></a><span class="n">reg</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">Z</span><span class="p">,</span> <span class="n">Y</span><span class="p">[</span><span class="n">idx</span><span class="p">])</span>
-<a id="__codelineno-4-3" name="__codelineno-4-3"></a>
-<a id="__codelineno-4-4" name="__codelineno-4-4"></a><span class="n">predictions</span> <span class="o">=</span> <span class="n">reg</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">Z</span><span class="p">)</span>
-<a id="__codelineno-4-5" name="__codelineno-4-5"></a><span class="n">mse</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">((</span><span class="n">predictions</span> <span class="o">-</span> <span class="n">Y</span><span class="p">[</span><span class="n">idx</span><span class="p">])</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
-<a id="__codelineno-4-6" name="__codelineno-4-6"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Mean Squared Error (Loss): </span><span class="si">{</span><span class="n">mse</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<div class="highlight"><table class="highlighttable"><tr><th colspan="2" class="filename"><span class="filename">Python</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span>
+<span class="normal">4</span>
+<span class="normal">5</span>
+<span class="normal">6</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="n">reg</span> <span class="o">=</span> <span class="n">linear_model</span><span class="o">.</span><span class="n">Lasso</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">)</span>
+<span class="n">reg</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">Z</span><span class="p">,</span> <span class="n">Y</span><span class="p">[</span><span class="n">idx</span><span class="p">])</span>
+
+<span class="n">predictions</span> <span class="o">=</span> <span class="n">reg</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">Z</span><span class="p">)</span>
+<span class="n">mse</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">((</span><span class="n">predictions</span> <span class="o">-</span> <span class="n">Y</span><span class="p">[</span><span class="n">idx</span><span class="p">])</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Mean Squared Error (Loss): </span><span class="si">{</span><span class="n">mse</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
 <blockquote>
 <p>Mean Squared Error (Loss): 0.043433766812086105</p>
 </blockquote>
-<p><strong>Lasso (Least Absolute Shrinkage and Selection Operator)</strong> is another <strong>regularized regression</strong> method, but it uses an <span class="arithmatex"><span class="MathJax_Preview">L_1</span><script type="math/tex">L_1</script></span>-norm penalty instead of <span class="arithmatex"><span class="MathJax_Preview">L_2</span><script type="math/tex">L_2</script></span>:</p>
-<div class="arithmatex">
-<div class="MathJax_Preview">
+<p><strong>Lasso (Least Absolute Shrinkage and Selection Operator)</strong> is another <strong>regularized regression</strong> method, but it uses an <span class="arithmatex">\(L_1\)</span>-norm penalty instead of <span class="arithmatex">\(L_2\)</span>:</p>
+<div class="arithmatex">\[
 \min_{\beta} \sum_{i=1}^{n} (y_i - X_i \beta)^2 + \lambda \sum_{j=1}^{p} |\beta_j|
-</div>
-<script type="math/tex; mode=display">
-\min_{\beta} \sum_{i=1}^{n} (y_i - X_i \beta)^2 + \lambda \sum_{j=1}^{p} |\beta_j|
-</script>
-</div>
+\]</div>
 <h4 id="intuition_1"><strong>Intuition:</strong></h4>
 <ul>
 <li>
@@ -2253,22 +2195,17 @@ Order: 14, loss: 0.15189</p>
 </ul>
 <h4 id="relation-to-prior-distribution"><strong>Relation to Prior Distribution</strong></h4>
 <p>Lasso regression corresponds to <strong>Bayesian regression</strong> with a <strong>Laplace prior</strong>:</p>
-<div class="arithmatex">
-<div class="MathJax_Preview">
+<div class="arithmatex">\[
 \beta_j \sim \text{Laplace}(0, b)
-</div>
-<script type="math/tex; mode=display">
-\beta_j \sim \text{Laplace}(0, b)
-</script>
-</div>
-<p>where <span class="arithmatex"><span class="MathJax_Preview">b = \frac{1}{\lambda}</span><script type="math/tex">b = \frac{1}{\lambda}</script></span>. The <strong>Laplace distribution</strong> is sharply peaked at zero, which encourages sparsity. This is why Lasso forces some coefficients to be exactly <strong>zero</strong>.</p>
+\]</div>
+<p>where <span class="arithmatex">\(b = \frac{1}{\lambda}\)</span>. The <strong>Laplace distribution</strong> is sharply peaked at zero, which encourages sparsity. This is why Lasso forces some coefficients to be exactly <strong>zero</strong>.</p>
 <h4 id="why-does-l1-regularization-perform-feature-selection"><strong>Why Does L1 Regularization Perform Feature Selection?</strong></h4>
 <ol>
 <li>
 <p><strong>Sparsity Effect:</strong></p>
 <ul>
 <li>
-<p>The L1 penalty encourages some coefficients <span class="arithmatex"><span class="MathJax_Preview">\beta_j</span><script type="math/tex">\beta_j</script></span> to be exactly <strong>zero</strong>.</p>
+<p>The L1 penalty encourages some coefficients <span class="arithmatex">\(\beta_j\)</span> to be exactly <strong>zero</strong>.</p>
 </li>
 <li>
 <p>This leads to a <strong>sparse</strong> model, where only a subset of the features are retained.</p>
@@ -2282,7 +2219,7 @@ Order: 14, loss: 0.15189</p>
 <p><strong>Optimization Property:</strong></p>
 <ul>
 <li>
-<p>The L1 norm creates a <strong>non-differentiable</strong> point at <span class="arithmatex"><span class="MathJax_Preview">\beta_j = 0</span><script type="math/tex">\beta_j = 0</script></span>, which forces some coefficients to shrink to zero.</p>
+<p>The L1 norm creates a <strong>non-differentiable</strong> point at <span class="arithmatex">\(\beta_j = 0\)</span>, which forces some coefficients to shrink to zero.</p>
 </li>
 <li>
 <p>Geometrically, the constraint region forms a <strong>diamond shape</strong>, which makes it more likely for the optimal solution to lie on the axes (i.e., some coefficients are zero).</p>
@@ -2303,22 +2240,17 @@ Order: 14, loss: 0.15189</p>
 </ol>
 <hr />
 <h3 id="elastic-net-regression">Elastic Net Regression</h3>
-<p><strong>Elastic Net</strong> combines both Ridge (<span class="arithmatex"><span class="MathJax_Preview">L_2</span><script type="math/tex">L_2</script></span>) and Lasso (<span class="arithmatex"><span class="MathJax_Preview">L_1</span><script type="math/tex">L_1</script></span>) penalties:</p>
-<div class="arithmatex">
-<div class="MathJax_Preview">
+<p><strong>Elastic Net</strong> combines both Ridge (<span class="arithmatex">\(L_2\)</span>) and Lasso (<span class="arithmatex">\(L_1\)</span>) penalties:</p>
+<div class="arithmatex">\[
 \min_{\beta} \sum_{i=1}^{n} (y_i - X_i \beta)^2 + \lambda_1 \sum_{j=1}^{p} |\beta_j| + \lambda_2 \sum_{j=1}^{p} \beta_j^2
-</div>
-<script type="math/tex; mode=display">
-\min_{\beta} \sum_{i=1}^{n} (y_i - X_i \beta)^2 + \lambda_1 \sum_{j=1}^{p} |\beta_j| + \lambda_2 \sum_{j=1}^{p} \beta_j^2
-</script>
-</div>
+\]</div>
 <p>where:</p>
 <ul>
 <li>
-<p><span class="arithmatex"><span class="MathJax_Preview">\lambda_1</span><script type="math/tex">\lambda_1</script></span> controls the Lasso part (feature selection).</p>
+<p><span class="arithmatex">\(\lambda_1\)</span> controls the Lasso part (feature selection).</p>
 </li>
 <li>
-<p><span class="arithmatex"><span class="MathJax_Preview">\lambda_2</span><script type="math/tex">\lambda_2</script></span> controls the Ridge part (shrinkage and handling collinearity).</p>
+<p><span class="arithmatex">\(\lambda_2\)</span> controls the Ridge part (shrinkage and handling collinearity).</p>
 </li>
 </ul>
 <h3 id="intuition_2"><strong>Intuition:</strong></h3>
@@ -2366,13 +2298,13 @@ Order: 14, loss: 0.15189</p>
 </ul>
 </li>
 </ul>
-<div class="highlight"><table class="highlighttable"><tr><th colspan="2" class="filename"><span class="filename">Python</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-5-1">1</a></span>
-<span class="normal"><a href="#__codelineno-5-2">2</a></span>
-<span class="normal"><a href="#__codelineno-5-3">3</a></span>
-<span class="normal"><a href="#__codelineno-5-4">4</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1"></a><span class="n">dataset</span> <span class="o">=</span> <span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">Y</span><span class="p">))</span>
-<a id="__codelineno-5-2" name="__codelineno-5-2"></a>
-<a id="__codelineno-5-3" name="__codelineno-5-3"></a><span class="c1"># omit repeated code</span>
-<a id="__codelineno-5-4" name="__codelineno-5-4"></a><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">X</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">linear</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">X</span><span class="p">))),</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">)</span>
+<div class="highlight"><table class="highlighttable"><tr><th colspan="2" class="filename"><span class="filename">Python</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span>
+<span class="normal">4</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="n">dataset</span> <span class="o">=</span> <span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">Y</span><span class="p">))</span>
+
+<span class="c1"># omit repeated code</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">X</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">linear</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">X</span><span class="p">))),</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
 <blockquote>
 <p>loss: 0.07207518070936203</p>
@@ -2408,30 +2340,30 @@ Order: 14, loss: 0.15189</p>
 </ul>
 </li>
 </ul>
-<div class="highlight"><table class="highlighttable"><tr><th colspan="2" class="filename"><span class="filename">Python</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-6-1">1</a></span>
-<span class="normal"><a href="#__codelineno-6-2">2</a></span>
-<span class="normal"><a href="#__codelineno-6-3">3</a></span>
-<span class="normal"><a href="#__codelineno-6-4">4</a></span>
-<span class="normal"><a href="#__codelineno-6-5">5</a></span>
-<span class="normal"><a href="#__codelineno-6-6">6</a></span>
-<span class="normal"><a href="#__codelineno-6-7">7</a></span>
-<span class="normal"><a href="#__codelineno-6-8">8</a></span>
-<span class="normal"><a href="#__codelineno-6-9">9</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1"></a><span class="kn">from</span> <span class="nn">sklearn.ensemble</span> <span class="kn">import</span> <span class="n">IsolationForest</span>
-<a id="__codelineno-6-2" name="__codelineno-6-2"></a>
-<a id="__codelineno-6-3" name="__codelineno-6-3"></a><span class="n">iso_forest</span> <span class="o">=</span> <span class="n">IsolationForest</span><span class="p">(</span><span class="n">contamination</span><span class="o">=</span><span class="mf">0.05</span><span class="p">)</span>  
-<a id="__codelineno-6-4" name="__codelineno-6-4"></a><span class="n">outliers</span> <span class="o">=</span> <span class="n">iso_forest</span><span class="o">.</span><span class="n">fit_predict</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
-<a id="__codelineno-6-5" name="__codelineno-6-5"></a>
-<a id="__codelineno-6-6" name="__codelineno-6-6"></a><span class="n">inliers</span> <span class="o">=</span> <span class="n">outliers</span> <span class="o">==</span> <span class="mi">1</span>
-<a id="__codelineno-6-7" name="__codelineno-6-7"></a>
-<a id="__codelineno-6-8" name="__codelineno-6-8"></a><span class="n">X_filtered</span> <span class="o">=</span> <span class="n">X</span><span class="p">[</span><span class="n">inliers</span><span class="p">]</span>
-<a id="__codelineno-6-9" name="__codelineno-6-9"></a><span class="n">Y_filtered</span> <span class="o">=</span> <span class="n">Y</span><span class="p">[</span><span class="n">inliers</span><span class="p">]</span>
+<div class="highlight"><table class="highlighttable"><tr><th colspan="2" class="filename"><span class="filename">Python</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span>
+<span class="normal">4</span>
+<span class="normal">5</span>
+<span class="normal">6</span>
+<span class="normal">7</span>
+<span class="normal">8</span>
+<span class="normal">9</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="kn">from</span> <span class="nn">sklearn.ensemble</span> <span class="kn">import</span> <span class="n">IsolationForest</span>
+
+<span class="n">iso_forest</span> <span class="o">=</span> <span class="n">IsolationForest</span><span class="p">(</span><span class="n">contamination</span><span class="o">=</span><span class="mf">0.05</span><span class="p">)</span>  
+<span class="n">outliers</span> <span class="o">=</span> <span class="n">iso_forest</span><span class="o">.</span><span class="n">fit_predict</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+
+<span class="n">inliers</span> <span class="o">=</span> <span class="n">outliers</span> <span class="o">==</span> <span class="mi">1</span>
+
+<span class="n">X_filtered</span> <span class="o">=</span> <span class="n">X</span><span class="p">[</span><span class="n">inliers</span><span class="p">]</span>
+<span class="n">Y_filtered</span> <span class="o">=</span> <span class="n">Y</span><span class="p">[</span><span class="n">inliers</span><span class="p">]</span>
 </code></pre></div></td></tr></table></div>
 <blockquote>
 <p>Mean Squared Error (Loss): 0.11134050786495209</p>
 </blockquote>
 <ul>
 <li>Robust regression (Huber loss).
-<div class="highlight"><table class="highlighttable"><tr><th colspan="2" class="filename"><span class="filename">Python</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-7-1">1</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1"></a><span class="n">reg</span> <span class="o">=</span> <span class="n">linear_model</span><span class="o">.</span><span class="n">HuberRegressor</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">epsilon</span><span class="o">=</span><span class="mf">1.5</span><span class="p">)</span>
+<div class="highlight"><table class="highlighttable"><tr><th colspan="2" class="filename"><span class="filename">Python</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="n">reg</span> <span class="o">=</span> <span class="n">linear_model</span><span class="o">.</span><span class="n">HuberRegressor</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">epsilon</span><span class="o">=</span><span class="mf">1.5</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div><blockquote>
 <p>Mean Squared Error (Loss): 0.03720296174287796</p>
 </blockquote>
@@ -2440,7 +2372,7 @@ Order: 14, loss: 0.15189</p>
 <p>The <strong>Huber loss</strong> is a combination of <strong>squared loss</strong> (used in ordinary least squares) and <strong>absolute loss</strong> (used in robust regression), designed to handle <strong>outliers</strong> more gracefully. It is particularly useful when you want a model that is robust to <strong>outliers</strong> but still penalizes small errors quadratically, like the regular least squares.</p>
 <blockquote>
 <p>[!Definition] Definition<br />
-The Huber loss function <span class="arithmatex"><span class="MathJax_Preview">L_\delta(y, \hat{y})</span><script type="math/tex">L_\delta(y, \hat{y})</script></span> is defined as:
+The Huber loss function <span class="arithmatex">\(L_\delta(y, \hat{y})\)</span> is defined as:
 $$
 L_\delta(y, \hat{y}) =<br />
 \begin{cases}<br />
@@ -2449,17 +2381,17 @@ L_\delta(y, \hat{y}) =<br />
 \end{cases}
 $$
 where:
-- <span class="arithmatex"><span class="MathJax_Preview">y</span><script type="math/tex">y</script></span> is the true value,
-- <span class="arithmatex"><span class="MathJax_Preview">\hat{y}</span><script type="math/tex">\hat{y}</script></span> is the predicted value,
-- <span class="arithmatex"><span class="MathJax_Preview">\delta</span><script type="math/tex">\delta</script></span> is a threshold that controls the transition between quadratic and linear loss.</p>
+- <span class="arithmatex">\(y\)</span> is the true value,
+- <span class="arithmatex">\(\hat{y}\)</span> is the predicted value,
+- <span class="arithmatex">\(\delta\)</span> is a threshold that controls the transition between quadratic and linear loss.</p>
 </blockquote>
 <h4 id="intuition_3"><strong>Intuition:</strong></h4>
 <ul>
 <li>
-<p>For errors less than or equal to <span class="arithmatex"><span class="MathJax_Preview">\delta</span><script type="math/tex">\delta</script></span>, the loss behaves like a <strong>squared error</strong> (quadratic), which heavily penalizes small deviations.</p>
+<p>For errors less than or equal to <span class="arithmatex">\(\delta\)</span>, the loss behaves like a <strong>squared error</strong> (quadratic), which heavily penalizes small deviations.</p>
 </li>
 <li>
-<p>For large errors (i.e., when the error is greater than <span class="arithmatex"><span class="MathJax_Preview">\delta</span><script type="math/tex">\delta</script></span>), the loss behaves like <strong>absolute error</strong>, which grows linearly, avoiding excessive penalties for large deviations or outliers.</p>
+<p>For large errors (i.e., when the error is greater than <span class="arithmatex">\(\delta\)</span>), the loss behaves like <strong>absolute error</strong>, which grows linearly, avoiding excessive penalties for large deviations or outliers.</p>
 </li>
 </ul>
 <p>This makes the <strong>Huber loss</strong> more <strong>robust to outliers</strong> compared to squared error (which can be highly influenced by large deviations).</p>
@@ -2491,13 +2423,13 @@ where:
 <p>If we have:</p>
 <ul>
 <li>
-<p>Learning rate <span class="arithmatex"><span class="MathJax_Preview">\eta</span><script type="math/tex">\eta</script></span> in {0.001, 0.01, 0.1}</p>
+<p>Learning rate <span class="arithmatex">\(\eta\)</span> in {0.001, 0.01, 0.1}</p>
 </li>
 <li>
-<p>Regularization <span class="arithmatex"><span class="MathJax_Preview">\lambda</span><script type="math/tex">\lambda</script></span> in {0.001, 0.01, 0.1}</p>
+<p>Regularization <span class="arithmatex">\(\lambda\)</span> in {0.001, 0.01, 0.1}</p>
 </li>
 </ul>
-<p>Grid search tests all <span class="arithmatex"><span class="MathJax_Preview">3 \times 3 = 9</span><script type="math/tex">3 \times 3 = 9</script></span> combinations.</p>
+<p>Grid search tests all <span class="arithmatex">\(3 \times 3 = 9\)</span> combinations.</p>
 <p>✅ <strong>Pros:</strong></p>
 <ul>
 <li>
@@ -2516,35 +2448,35 @@ where:
 <p>Wasteful if only a few hyperparameters matter.</p>
 </li>
 </ul>
-<div class="highlight"><table class="highlighttable"><tr><th colspan="2" class="filename"><span class="filename">Python</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-8-1"> 1</a></span>
-<span class="normal"><a href="#__codelineno-8-2"> 2</a></span>
-<span class="normal"><a href="#__codelineno-8-3"> 3</a></span>
-<span class="normal"><a href="#__codelineno-8-4"> 4</a></span>
-<span class="normal"><a href="#__codelineno-8-5"> 5</a></span>
-<span class="normal"><a href="#__codelineno-8-6"> 6</a></span>
-<span class="normal"><a href="#__codelineno-8-7"> 7</a></span>
-<span class="normal"><a href="#__codelineno-8-8"> 8</a></span>
-<span class="normal"><a href="#__codelineno-8-9"> 9</a></span>
-<span class="normal"><a href="#__codelineno-8-10">10</a></span>
-<span class="normal"><a href="#__codelineno-8-11">11</a></span>
-<span class="normal"><a href="#__codelineno-8-12">12</a></span>
-<span class="normal"><a href="#__codelineno-8-13">13</a></span>
-<span class="normal"><a href="#__codelineno-8-14">14</a></span>
-<span class="normal"><a href="#__codelineno-8-15">15</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1"></a><span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">GridSearchCV</span>
-<a id="__codelineno-8-2" name="__codelineno-8-2"></a><span class="kn">from</span> <span class="nn">sklearn.ensemble</span> <span class="kn">import</span> <span class="n">RandomForestClassifier</span>
-<a id="__codelineno-8-3" name="__codelineno-8-3"></a>
-<a id="__codelineno-8-4" name="__codelineno-8-4"></a><span class="n">param_grid</span> <span class="o">=</span> <span class="p">{</span>
-<a id="__codelineno-8-5" name="__codelineno-8-5"></a>    <span class="s1">&#39;n_estimators&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">100</span><span class="p">],</span>
-<a id="__codelineno-8-6" name="__codelineno-8-6"></a>    <span class="s1">&#39;max_depth&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">],</span>
-<a id="__codelineno-8-7" name="__codelineno-8-7"></a>    <span class="s1">&#39;min_samples_split&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">]</span>
-<a id="__codelineno-8-8" name="__codelineno-8-8"></a><span class="p">}</span>
-<a id="__codelineno-8-9" name="__codelineno-8-9"></a>
-<a id="__codelineno-8-10" name="__codelineno-8-10"></a><span class="n">clf</span> <span class="o">=</span> <span class="n">RandomForestClassifier</span><span class="p">()</span>
-<a id="__codelineno-8-11" name="__codelineno-8-11"></a><span class="n">grid_search</span> <span class="o">=</span> <span class="n">GridSearchCV</span><span class="p">(</span><span class="n">clf</span><span class="p">,</span> <span class="n">param_grid</span><span class="p">,</span> <span class="n">cv</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">scoring</span><span class="o">=</span><span class="s1">&#39;accuracy&#39;</span><span class="p">)</span>
-<a id="__codelineno-8-12" name="__codelineno-8-12"></a><span class="n">grid_search</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
-<a id="__codelineno-8-13" name="__codelineno-8-13"></a>
-<a id="__codelineno-8-14" name="__codelineno-8-14"></a><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Best parameters:&quot;</span><span class="p">,</span> <span class="n">grid_search</span><span class="o">.</span><span class="n">best_params_</span><span class="p">)</span>
-<a id="__codelineno-8-15" name="__codelineno-8-15"></a><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Best score:&quot;</span><span class="p">,</span> <span class="n">grid_search</span><span class="o">.</span><span class="n">best_score_</span><span class="p">)</span>
+<div class="highlight"><table class="highlighttable"><tr><th colspan="2" class="filename"><span class="filename">Python</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">GridSearchCV</span>
+<span class="kn">from</span> <span class="nn">sklearn.ensemble</span> <span class="kn">import</span> <span class="n">RandomForestClassifier</span>
+
+<span class="n">param_grid</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;n_estimators&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">100</span><span class="p">],</span>
+    <span class="s1">&#39;max_depth&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">],</span>
+    <span class="s1">&#39;min_samples_split&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">]</span>
+<span class="p">}</span>
+
+<span class="n">clf</span> <span class="o">=</span> <span class="n">RandomForestClassifier</span><span class="p">()</span>
+<span class="n">grid_search</span> <span class="o">=</span> <span class="n">GridSearchCV</span><span class="p">(</span><span class="n">clf</span><span class="p">,</span> <span class="n">param_grid</span><span class="p">,</span> <span class="n">cv</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">scoring</span><span class="o">=</span><span class="s1">&#39;accuracy&#39;</span><span class="p">)</span>
+<span class="n">grid_search</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Best parameters:&quot;</span><span class="p">,</span> <span class="n">grid_search</span><span class="o">.</span><span class="n">best_params_</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Best score:&quot;</span><span class="p">,</span> <span class="n">grid_search</span><span class="o">.</span><span class="n">best_score_</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
 <hr />
 <h4 id="random-search"><strong>Random Search</strong></h4>
@@ -2574,35 +2506,35 @@ where:
 </ul>
 <p>❌ <strong>Cons:</strong>
 - No guarantee of finding the absolute best hyperparameters.</p>
-<div class="highlight"><table class="highlighttable"><tr><th colspan="2" class="filename"><span class="filename">Python</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-9-1"> 1</a></span>
-<span class="normal"><a href="#__codelineno-9-2"> 2</a></span>
-<span class="normal"><a href="#__codelineno-9-3"> 3</a></span>
-<span class="normal"><a href="#__codelineno-9-4"> 4</a></span>
-<span class="normal"><a href="#__codelineno-9-5"> 5</a></span>
-<span class="normal"><a href="#__codelineno-9-6"> 6</a></span>
-<span class="normal"><a href="#__codelineno-9-7"> 7</a></span>
-<span class="normal"><a href="#__codelineno-9-8"> 8</a></span>
-<span class="normal"><a href="#__codelineno-9-9"> 9</a></span>
-<span class="normal"><a href="#__codelineno-9-10">10</a></span>
-<span class="normal"><a href="#__codelineno-9-11">11</a></span>
-<span class="normal"><a href="#__codelineno-9-12">12</a></span>
-<span class="normal"><a href="#__codelineno-9-13">13</a></span>
-<span class="normal"><a href="#__codelineno-9-14">14</a></span>
-<span class="normal"><a href="#__codelineno-9-15">15</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1"></a><span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">RandomizedSearchCV</span>
-<a id="__codelineno-9-2" name="__codelineno-9-2"></a><span class="kn">from</span> <span class="nn">scipy.stats</span> <span class="kn">import</span> <span class="n">randint</span>
-<a id="__codelineno-9-3" name="__codelineno-9-3"></a>
-<a id="__codelineno-9-4" name="__codelineno-9-4"></a><span class="n">param_dist</span> <span class="o">=</span> <span class="p">{</span>
-<a id="__codelineno-9-5" name="__codelineno-9-5"></a>    <span class="s1">&#39;n_estimators&#39;</span><span class="p">:</span> <span class="n">randint</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">200</span><span class="p">),</span>
-<a id="__codelineno-9-6" name="__codelineno-9-6"></a>    <span class="s1">&#39;max_depth&#39;</span><span class="p">:</span> <span class="n">randint</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">20</span><span class="p">),</span>
-<a id="__codelineno-9-7" name="__codelineno-9-7"></a>    <span class="s1">&#39;min_samples_split&#39;</span><span class="p">:</span> <span class="n">randint</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">20</span><span class="p">)</span>
-<a id="__codelineno-9-8" name="__codelineno-9-8"></a><span class="p">}</span>
-<a id="__codelineno-9-9" name="__codelineno-9-9"></a>
-<a id="__codelineno-9-10" name="__codelineno-9-10"></a><span class="n">clf</span> <span class="o">=</span> <span class="n">RandomForestClassifier</span><span class="p">()</span>
-<a id="__codelineno-9-11" name="__codelineno-9-11"></a><span class="n">random_search</span> <span class="o">=</span> <span class="n">RandomizedSearchCV</span><span class="p">(</span><span class="n">clf</span><span class="p">,</span> <span class="n">param_dist</span><span class="p">,</span> <span class="n">n_iter</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">cv</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">scoring</span><span class="o">=</span><span class="s1">&#39;accuracy&#39;</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
-<a id="__codelineno-9-12" name="__codelineno-9-12"></a><span class="n">random_search</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
-<a id="__codelineno-9-13" name="__codelineno-9-13"></a>
-<a id="__codelineno-9-14" name="__codelineno-9-14"></a><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Best parameters:&quot;</span><span class="p">,</span> <span class="n">random_search</span><span class="o">.</span><span class="n">best_params_</span><span class="p">)</span>
-<a id="__codelineno-9-15" name="__codelineno-9-15"></a><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Best score:&quot;</span><span class="p">,</span> <span class="n">random_search</span><span class="o">.</span><span class="n">best_score_</span><span class="p">)</span>
+<div class="highlight"><table class="highlighttable"><tr><th colspan="2" class="filename"><span class="filename">Python</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">RandomizedSearchCV</span>
+<span class="kn">from</span> <span class="nn">scipy.stats</span> <span class="kn">import</span> <span class="n">randint</span>
+
+<span class="n">param_dist</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;n_estimators&#39;</span><span class="p">:</span> <span class="n">randint</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">200</span><span class="p">),</span>
+    <span class="s1">&#39;max_depth&#39;</span><span class="p">:</span> <span class="n">randint</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">20</span><span class="p">),</span>
+    <span class="s1">&#39;min_samples_split&#39;</span><span class="p">:</span> <span class="n">randint</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">20</span><span class="p">)</span>
+<span class="p">}</span>
+
+<span class="n">clf</span> <span class="o">=</span> <span class="n">RandomForestClassifier</span><span class="p">()</span>
+<span class="n">random_search</span> <span class="o">=</span> <span class="n">RandomizedSearchCV</span><span class="p">(</span><span class="n">clf</span><span class="p">,</span> <span class="n">param_dist</span><span class="p">,</span> <span class="n">n_iter</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">cv</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">scoring</span><span class="o">=</span><span class="s1">&#39;accuracy&#39;</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
+<span class="n">random_search</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Best parameters:&quot;</span><span class="p">,</span> <span class="n">random_search</span><span class="o">.</span><span class="n">best_params_</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Best score:&quot;</span><span class="p">,</span> <span class="n">random_search</span><span class="o">.</span><span class="n">best_score_</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
 <hr />
 <h4 id="bayesian-optimization-bo"><strong>Bayesian Optimization (BO)</strong></h4>
@@ -2657,61 +2589,61 @@ where:
 </ul>
 </li>
 </ul>
-<div class="highlight"><table class="highlighttable"><tr><th colspan="2" class="filename"><span class="filename">Python</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-10-1"> 1</a></span>
-<span class="normal"><a href="#__codelineno-10-2"> 2</a></span>
-<span class="normal"><a href="#__codelineno-10-3"> 3</a></span>
-<span class="normal"><a href="#__codelineno-10-4"> 4</a></span>
-<span class="normal"><a href="#__codelineno-10-5"> 5</a></span>
-<span class="normal"><a href="#__codelineno-10-6"> 6</a></span>
-<span class="normal"><a href="#__codelineno-10-7"> 7</a></span>
-<span class="normal"><a href="#__codelineno-10-8"> 8</a></span>
-<span class="normal"><a href="#__codelineno-10-9"> 9</a></span>
-<span class="normal"><a href="#__codelineno-10-10">10</a></span>
-<span class="normal"><a href="#__codelineno-10-11">11</a></span>
-<span class="normal"><a href="#__codelineno-10-12">12</a></span>
-<span class="normal"><a href="#__codelineno-10-13">13</a></span>
-<span class="normal"><a href="#__codelineno-10-14">14</a></span>
-<span class="normal"><a href="#__codelineno-10-15">15</a></span>
-<span class="normal"><a href="#__codelineno-10-16">16</a></span>
-<span class="normal"><a href="#__codelineno-10-17">17</a></span>
-<span class="normal"><a href="#__codelineno-10-18">18</a></span>
-<span class="normal"><a href="#__codelineno-10-19">19</a></span>
-<span class="normal"><a href="#__codelineno-10-20">20</a></span>
-<span class="normal"><a href="#__codelineno-10-21">21</a></span>
-<span class="normal"><a href="#__codelineno-10-22">22</a></span>
-<span class="normal"><a href="#__codelineno-10-23">23</a></span>
-<span class="normal"><a href="#__codelineno-10-24">24</a></span>
-<span class="normal"><a href="#__codelineno-10-25">25</a></span>
-<span class="normal"><a href="#__codelineno-10-26">26</a></span>
-<span class="normal"><a href="#__codelineno-10-27">27</a></span>
-<span class="normal"><a href="#__codelineno-10-28">28</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1"></a><span class="kn">from</span> <span class="nn">bayes_opt</span> <span class="kn">import</span> <span class="n">BayesianOptimization</span>
-<a id="__codelineno-10-2" name="__codelineno-10-2"></a>
-<a id="__codelineno-10-3" name="__codelineno-10-3"></a><span class="k">def</span> <span class="nf">rf_cv</span><span class="p">(</span><span class="n">n_estimators</span><span class="p">,</span> <span class="n">max_depth</span><span class="p">,</span> <span class="n">min_samples_split</span><span class="p">):</span>
-<a id="__codelineno-10-4" name="__codelineno-10-4"></a>    <span class="n">model</span> <span class="o">=</span> <span class="n">RandomForestClassifier</span><span class="p">(</span>
-<a id="__codelineno-10-5" name="__codelineno-10-5"></a>        <span class="n">n_estimators</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">n_estimators</span><span class="p">),</span>
-<a id="__codelineno-10-6" name="__codelineno-10-6"></a>        <span class="n">max_depth</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">max_depth</span><span class="p">),</span>
-<a id="__codelineno-10-7" name="__codelineno-10-7"></a>        <span class="n">min_samples_split</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">min_samples_split</span><span class="p">),</span>
-<a id="__codelineno-10-8" name="__codelineno-10-8"></a>        <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span>
-<a id="__codelineno-10-9" name="__codelineno-10-9"></a>    <span class="p">)</span>
-<a id="__codelineno-10-10" name="__codelineno-10-10"></a>    <span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
-<a id="__codelineno-10-11" name="__codelineno-10-11"></a>    <span class="k">return</span> <span class="n">model</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">)</span>  <span class="c1"># Optimization objective</span>
-<a id="__codelineno-10-12" name="__codelineno-10-12"></a>
-<a id="__codelineno-10-13" name="__codelineno-10-13"></a><span class="c1"># Define hyperparameter space</span>
-<a id="__codelineno-10-14" name="__codelineno-10-14"></a><span class="n">pbounds</span> <span class="o">=</span> <span class="p">{</span>
-<a id="__codelineno-10-15" name="__codelineno-10-15"></a>    <span class="s1">&#39;n_estimators&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">200</span><span class="p">),</span>
-<a id="__codelineno-10-16" name="__codelineno-10-16"></a>    <span class="s1">&#39;max_depth&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">20</span><span class="p">),</span>
-<a id="__codelineno-10-17" name="__codelineno-10-17"></a>    <span class="s1">&#39;min_samples_split&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">20</span><span class="p">)</span>
-<a id="__codelineno-10-18" name="__codelineno-10-18"></a><span class="p">}</span>
-<a id="__codelineno-10-19" name="__codelineno-10-19"></a>
-<a id="__codelineno-10-20" name="__codelineno-10-20"></a><span class="n">optimizer</span> <span class="o">=</span> <span class="n">BayesianOptimization</span><span class="p">(</span>
-<a id="__codelineno-10-21" name="__codelineno-10-21"></a>    <span class="n">f</span><span class="o">=</span><span class="n">rf_cv</span><span class="p">,</span>
-<a id="__codelineno-10-22" name="__codelineno-10-22"></a>    <span class="n">pbounds</span><span class="o">=</span><span class="n">pbounds</span><span class="p">,</span>
-<a id="__codelineno-10-23" name="__codelineno-10-23"></a>    <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span>
-<a id="__codelineno-10-24" name="__codelineno-10-24"></a><span class="p">)</span>
-<a id="__codelineno-10-25" name="__codelineno-10-25"></a>
-<a id="__codelineno-10-26" name="__codelineno-10-26"></a><span class="n">optimizer</span><span class="o">.</span><span class="n">maximize</span><span class="p">(</span><span class="n">init_points</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">n_iter</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
-<a id="__codelineno-10-27" name="__codelineno-10-27"></a>
-<a id="__codelineno-10-28" name="__codelineno-10-28"></a><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Best parameters found:&quot;</span><span class="p">,</span> <span class="n">optimizer</span><span class="o">.</span><span class="n">max</span><span class="p">)</span>
+<div class="highlight"><table class="highlighttable"><tr><th colspan="2" class="filename"><span class="filename">Python</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span>
+<span class="normal">19</span>
+<span class="normal">20</span>
+<span class="normal">21</span>
+<span class="normal">22</span>
+<span class="normal">23</span>
+<span class="normal">24</span>
+<span class="normal">25</span>
+<span class="normal">26</span>
+<span class="normal">27</span>
+<span class="normal">28</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="kn">from</span> <span class="nn">bayes_opt</span> <span class="kn">import</span> <span class="n">BayesianOptimization</span>
+
+<span class="k">def</span> <span class="nf">rf_cv</span><span class="p">(</span><span class="n">n_estimators</span><span class="p">,</span> <span class="n">max_depth</span><span class="p">,</span> <span class="n">min_samples_split</span><span class="p">):</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">RandomForestClassifier</span><span class="p">(</span>
+        <span class="n">n_estimators</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">n_estimators</span><span class="p">),</span>
+        <span class="n">max_depth</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">max_depth</span><span class="p">),</span>
+        <span class="n">min_samples_split</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">min_samples_split</span><span class="p">),</span>
+        <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span>
+    <span class="p">)</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">model</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">)</span>  <span class="c1"># Optimization objective</span>
+
+<span class="c1"># Define hyperparameter space</span>
+<span class="n">pbounds</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;n_estimators&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">200</span><span class="p">),</span>
+    <span class="s1">&#39;max_depth&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">20</span><span class="p">),</span>
+    <span class="s1">&#39;min_samples_split&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">20</span><span class="p">)</span>
+<span class="p">}</span>
+
+<span class="n">optimizer</span> <span class="o">=</span> <span class="n">BayesianOptimization</span><span class="p">(</span>
+    <span class="n">f</span><span class="o">=</span><span class="n">rf_cv</span><span class="p">,</span>
+    <span class="n">pbounds</span><span class="o">=</span><span class="n">pbounds</span><span class="p">,</span>
+    <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span>
+<span class="p">)</span>
+
+<span class="n">optimizer</span><span class="o">.</span><span class="n">maximize</span><span class="p">(</span><span class="n">init_points</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">n_iter</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Best parameters found:&quot;</span><span class="p">,</span> <span class="n">optimizer</span><span class="o">.</span><span class="n">max</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
 <hr />
 <h5 id="why-bayesian-optimization-is-powerful"><strong>Why Bayesian Optimization is Powerful?</strong></h5>
@@ -2769,11 +2701,11 @@ where:
 </li>
 </ul>
 <h4 id="random-forest">Random Forest</h4>
-<div class="highlight"><table class="highlighttable"><tr><th colspan="2" class="filename"><span class="filename">Python</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-11-1">1</a></span>
-<span class="normal"><a href="#__codelineno-11-2">2</a></span>
-<span class="normal"><a href="#__codelineno-11-3">3</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1"></a><span class="kn">from</span> <span class="nn">sklearn.ensemble</span> <span class="kn">import</span> <span class="n">RandomForestRegressor</span>
-<a id="__codelineno-11-2" name="__codelineno-11-2"></a>
-<a id="__codelineno-11-3" name="__codelineno-11-3"></a><span class="n">rf</span> <span class="o">=</span> <span class="n">RandomForestRegressor</span><span class="p">(</span><span class="n">n_estimators</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
+<div class="highlight"><table class="highlighttable"><tr><th colspan="2" class="filename"><span class="filename">Python</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="kn">from</span> <span class="nn">sklearn.ensemble</span> <span class="kn">import</span> <span class="n">RandomForestRegressor</span>
+
+<span class="n">rf</span> <span class="o">=</span> <span class="n">RandomForestRegressor</span><span class="p">(</span><span class="n">n_estimators</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
 <blockquote>
 <p>Mean Squared Error (Loss): 0.008086484856903553</p>
@@ -2814,17 +2746,17 @@ where:
 <p>❌ Slower than a single decision tree.</p>
 <p>❌ Large ensembles can be computationally expensive.</p>
 <h4 id="gbdt-gradient-boosted-decision-trees">GBDT (Gradient Boosted Decision Trees)</h4>
-<div class="highlight"><table class="highlighttable"><tr><th colspan="2" class="filename"><span class="filename">Python</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-12-1">1</a></span>
-<span class="normal"><a href="#__codelineno-12-2">2</a></span>
-<span class="normal"><a href="#__codelineno-12-3">3</a></span>
-<span class="normal"><a href="#__codelineno-12-4">4</a></span>
-<span class="normal"><a href="#__codelineno-12-5">5</a></span>
-<span class="normal"><a href="#__codelineno-12-6">6</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1"></a><span class="kn">import</span> <span class="nn">lightgbm</span> <span class="k">as</span> <span class="nn">lgb</span>
-<a id="__codelineno-12-2" name="__codelineno-12-2"></a>
-<a id="__codelineno-12-3" name="__codelineno-12-3"></a><span class="n">lgb_train</span> <span class="o">=</span> <span class="n">lgb</span><span class="o">.</span><span class="n">Dataset</span><span class="p">(</span><span class="n">Z</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">Y</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span>
-<a id="__codelineno-12-4" name="__codelineno-12-4"></a><span class="n">params</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;objective&#39;</span><span class="p">:</span> <span class="s1">&#39;regression&#39;</span><span class="p">,</span> <span class="s1">&#39;metric&#39;</span><span class="p">:</span> <span class="s1">&#39;mse&#39;</span><span class="p">,</span> <span class="s1">&#39;boosting_type&#39;</span><span class="p">:</span> <span class="s1">&#39;gbdt&#39;</span><span class="p">,</span> <span class="s1">&#39;verbose&#39;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">}</span>
-<a id="__codelineno-12-5" name="__codelineno-12-5"></a><span class="n">lgb_model</span> <span class="o">=</span> <span class="n">lgb</span><span class="o">.</span><span class="n">train</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">lgb_train</span><span class="p">,</span> <span class="n">num_boost_round</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
-<a id="__codelineno-12-6" name="__codelineno-12-6"></a><span class="n">predictions</span> <span class="o">=</span> <span class="n">lgb_model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">Z</span><span class="p">)</span>
+<div class="highlight"><table class="highlighttable"><tr><th colspan="2" class="filename"><span class="filename">Python</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span>
+<span class="normal">4</span>
+<span class="normal">5</span>
+<span class="normal">6</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="kn">import</span> <span class="nn">lightgbm</span> <span class="k">as</span> <span class="nn">lgb</span>
+
+<span class="n">lgb_train</span> <span class="o">=</span> <span class="n">lgb</span><span class="o">.</span><span class="n">Dataset</span><span class="p">(</span><span class="n">Z</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">Y</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span>
+<span class="n">params</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;objective&#39;</span><span class="p">:</span> <span class="s1">&#39;regression&#39;</span><span class="p">,</span> <span class="s1">&#39;metric&#39;</span><span class="p">:</span> <span class="s1">&#39;mse&#39;</span><span class="p">,</span> <span class="s1">&#39;boosting_type&#39;</span><span class="p">:</span> <span class="s1">&#39;gbdt&#39;</span><span class="p">,</span> <span class="s1">&#39;verbose&#39;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">}</span>
+<span class="n">lgb_model</span> <span class="o">=</span> <span class="n">lgb</span><span class="o">.</span><span class="n">train</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">lgb_train</span><span class="p">,</span> <span class="n">num_boost_round</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+<span class="n">predictions</span> <span class="o">=</span> <span class="n">lgb_model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">Z</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
 <blockquote>
 <p>Mean Squared Error (Loss): 0.19826513528823853</p>
@@ -2851,25 +2783,15 @@ where:
 <ul>
 <li>For regression:</li>
 </ul>
-<div class="arithmatex">
-<div class="MathJax_Preview">
+<div class="arithmatex">\[
 r_i = y_i - \hat{y}_i
-</div>
-<script type="math/tex; mode=display">
-r_i = y_i - \hat{y}_i
-</script>
-</div>
+\]</div>
 <ul>
 <li>For classification:</li>
 </ul>
-<div class="arithmatex">
-<div class="MathJax_Preview">
+<div class="arithmatex">\[
 r_i = -\frac{\partial L(y, \hat{y})}{\partial \hat{y}}
-</div>
-<script type="math/tex; mode=display">
-r_i = -\frac{\partial L(y, \hat{y})}{\partial \hat{y}}
-</script>
-</div>
+\]</div>
 <ul>
 <li>The model learns the difference (residuals) between the predicted and actual values.</li>
 </ul>
@@ -2885,16 +2807,11 @@ r_i = -\frac{\partial L(y, \hat{y})}{\partial \hat{y}}
 <ul>
 <li>Add the new tree's predictions to the overall model:</li>
 </ul>
-<div class="arithmatex">
-<div class="MathJax_Preview">
+<div class="arithmatex">\[
 F_{m+1}(x) = F_m(x) + \eta h_m(x)
-</div>
-<script type="math/tex; mode=display">
-F_{m+1}(x) = F_m(x) + \eta h_m(x)
-</script>
-</div>
+\]</div>
 <ul>
-<li><span class="arithmatex"><span class="MathJax_Preview">\eta</span><script type="math/tex">\eta</script></span> is the <strong>learning rate</strong>, which controls how much each tree contributes to the final prediction.</li>
+<li><span class="arithmatex">\(\eta\)</span> is the <strong>learning rate</strong>, which controls how much each tree contributes to the final prediction.</li>
 </ul>
 </li>
 <li>
@@ -3022,7 +2939,7 @@ F_{m+1}(x) = F_m(x) + \eta h_m(x)
 </li>
 </ul>
 <h4 id="bayesian-regression"><strong>Bayesian Regression</strong></h4>
-<div class="highlight"><table class="highlighttable"><tr><th colspan="2" class="filename"><span class="filename">Python</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-13-1">1</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1"></a><span class="n">reg</span> <span class="o">=</span> <span class="n">linear_model</span><span class="o">.</span><span class="n">BayesianRidge</span><span class="p">()</span>
+<div class="highlight"><table class="highlighttable"><tr><th colspan="2" class="filename"><span class="filename">Python</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="n">reg</span> <span class="o">=</span> <span class="n">linear_model</span><span class="o">.</span><span class="n">BayesianRidge</span><span class="p">()</span>
 </code></pre></div></td></tr></table></div>
 <blockquote>
 <p>Mean Squared Error (Loss): 0.03729788959026337</p>
@@ -3035,129 +2952,89 @@ F_{m+1}(x) = F_m(x) + \eta h_m(x)
 <ul>
 <li>
 <p>Assume a linear model for the data:</p>
-<div class="arithmatex">
-<div class="MathJax_Preview">
+<div class="arithmatex">\[
 y = X\beta + \epsilon
-</div>
-<script type="math/tex; mode=display">
-y = X\beta + \epsilon
-</script>
-</div>
+\]</div>
 <p>where:</p>
 </li>
 <li>
-<p><span class="arithmatex"><span class="MathJax_Preview">y</span><script type="math/tex">y</script></span> is the vector of observed values,</p>
+<p><span class="arithmatex">\(y\)</span> is the vector of observed values,</p>
 </li>
 <li>
-<p><span class="arithmatex"><span class="MathJax_Preview">X</span><script type="math/tex">X</script></span> is the design matrix (input features),</p>
+<p><span class="arithmatex">\(X\)</span> is the design matrix (input features),</p>
 </li>
 <li>
-<p><span class="arithmatex"><span class="MathJax_Preview">\beta</span><script type="math/tex">\beta</script></span> is the vector of regression coefficients (parameters),</p>
+<p><span class="arithmatex">\(\beta\)</span> is the vector of regression coefficients (parameters),</p>
 </li>
 <li>
-<p><span class="arithmatex"><span class="MathJax_Preview">\epsilon \sim \mathcal{N}(0, \sigma^2 I)</span><script type="math/tex">\epsilon \sim \mathcal{N}(0, \sigma^2 I)</script></span> is the Gaussian noise with variance <span class="arithmatex"><span class="MathJax_Preview">\sigma^2</span><script type="math/tex">\sigma^2</script></span>.</p>
+<p><span class="arithmatex">\(\epsilon \sim \mathcal{N}(0, \sigma^2 I)\)</span> is the Gaussian noise with variance <span class="arithmatex">\(\sigma^2\)</span>.</p>
 </li>
 </ul>
 </li>
 <li>
 <p><strong>Prior</strong>:</p>
 <ul>
-<li>Assume a <strong>Gaussian prior</strong> on the coefficients <span class="arithmatex"><span class="MathJax_Preview">\beta</span><script type="math/tex">\beta</script></span>:</li>
+<li>Assume a <strong>Gaussian prior</strong> on the coefficients <span class="arithmatex">\(\beta\)</span>:</li>
 </ul>
-<div class="arithmatex">
-<div class="MathJax_Preview">
+<div class="arithmatex">\[
 p(\beta) = \mathcal{N}(\beta \mid 0, \tau^2 I)
-</div>
-<script type="math/tex; mode=display">
-p(\beta) = \mathcal{N}(\beta \mid 0, \tau^2 I)
-</script>
-</div>
-<p>where <span class="arithmatex"><span class="MathJax_Preview">\tau^2</span><script type="math/tex">\tau^2</script></span> is the prior variance of the coefficients.</p>
+\]</div>
+<p>where <span class="arithmatex">\(\tau^2\)</span> is the prior variance of the coefficients.</p>
 </li>
 <li>
 <p><strong>Likelihood</strong>:</p>
 <ul>
 <li>The likelihood function given the data is:</li>
 </ul>
-<div class="arithmatex">
-<div class="MathJax_Preview">
+<div class="arithmatex">\[
 p(y \mid X, \beta, \sigma^2) = \mathcal{N}(y \mid X\beta, \sigma^2 I)
-</div>
-<script type="math/tex; mode=display">
-p(y \mid X, \beta, \sigma^2) = \mathcal{N}(y \mid X\beta, \sigma^2 I)
-</script>
-</div>
-<p>This is a Gaussian distribution with mean <span class="arithmatex"><span class="MathJax_Preview">X\beta</span><script type="math/tex">X\beta</script></span> and covariance <span class="arithmatex"><span class="MathJax_Preview">\sigma^2 I</span><script type="math/tex">\sigma^2 I</script></span>.</p>
+\]</div>
+<p>This is a Gaussian distribution with mean <span class="arithmatex">\(X\beta\)</span> and covariance <span class="arithmatex">\(\sigma^2 I\)</span>.</p>
 </li>
 <li>
 <p><strong>Posterior</strong> (Bayes' Theorem):</p>
 <ul>
-<li>Using Bayes' Theorem, the posterior distribution of <span class="arithmatex"><span class="MathJax_Preview">\beta</span><script type="math/tex">\beta</script></span> given the data is:</li>
+<li>Using Bayes' Theorem, the posterior distribution of <span class="arithmatex">\(\beta\)</span> given the data is:</li>
 </ul>
-<div class="arithmatex">
-<div class="MathJax_Preview">
+<div class="arithmatex">\[
 p(\beta \mid X, y, \sigma^2) \propto p(y \mid X, \beta, \sigma^2) p(\beta)
-</div>
-<script type="math/tex; mode=display">
-p(\beta \mid X, y, \sigma^2) \propto p(y \mid X, \beta, \sigma^2) p(\beta)
-</script>
-</div>
+\]</div>
 </li>
 <li>
 <p><strong>Maximum Likelihood Estimation</strong>:</p>
 <ul>
 <li>
-<p>To find the <strong>maximum likelihood estimates</strong> (MLE) of the parameters <span class="arithmatex"><span class="MathJax_Preview">\beta</span><script type="math/tex">\beta</script></span> and <span class="arithmatex"><span class="MathJax_Preview">\sigma^2</span><script type="math/tex">\sigma^2</script></span>, we can maximize the likelihood function:</p>
-<div class="arithmatex">
-<div class="MathJax_Preview">
+<p>To find the <strong>maximum likelihood estimates</strong> (MLE) of the parameters <span class="arithmatex">\(\beta\)</span> and <span class="arithmatex">\(\sigma^2\)</span>, we can maximize the likelihood function:</p>
+<div class="arithmatex">\[
 \mathcal{L}(\beta, \sigma^2 \mid X, y) = p(y \mid X, \beta, \sigma^2)
-</div>
-<script type="math/tex; mode=display">
-\mathcal{L}(\beta, \sigma^2 \mid X, y) = p(y \mid X, \beta, \sigma^2)
-</script>
-</div>
+\]</div>
 </li>
 <li>
 <p>The log-likelihood is:</p>
-<div class="arithmatex">
-<div class="MathJax_Preview">
+<div class="arithmatex">\[
 \log \mathcal{L}(\beta, \sigma^2 \mid X, y) = -\frac{N}{2} \log (2\pi \sigma^2) - \frac{1}{2\sigma^2} \| y - X\beta \|^2
-</div>
-<script type="math/tex; mode=display">
-\log \mathcal{L}(\beta, \sigma^2 \mid X, y) = -\frac{N}{2} \log (2\pi \sigma^2) - \frac{1}{2\sigma^2} \| y - X\beta \|^2
-</script>
-</div>
+\]</div>
 </li>
 <li>
-<p>To maximize this, take the derivative with respect to <span class="arithmatex"><span class="MathJax_Preview">\beta</span><script type="math/tex">\beta</script></span> and <span class="arithmatex"><span class="MathJax_Preview">\sigma^2</span><script type="math/tex">\sigma^2</script></span>, set them to zero, and solve for <span class="arithmatex"><span class="MathJax_Preview">\beta</span><script type="math/tex">\beta</script></span> and <span class="arithmatex"><span class="MathJax_Preview">\sigma^2</span><script type="math/tex">\sigma^2</script></span>.</p>
+<p>To maximize this, take the derivative with respect to <span class="arithmatex">\(\beta\)</span> and <span class="arithmatex">\(\sigma^2\)</span>, set them to zero, and solve for <span class="arithmatex">\(\beta\)</span> and <span class="arithmatex">\(\sigma^2\)</span>.</p>
 </li>
 </ul>
 </li>
 </ol>
-<h5 id="mle-for-betabeta"><strong>MLE for <span class="arithmatex"><span class="MathJax_Preview">\beta</span><script type="math/tex">\beta</script></span></strong></h5>
+<h5 id="mle-for-beta"><strong>MLE for <span class="arithmatex">\(\beta\)</span></strong></h5>
 <ul>
-<li>The MLE of <span class="arithmatex"><span class="MathJax_Preview">\beta</span><script type="math/tex">\beta</script></span> (ignoring <span class="arithmatex"><span class="MathJax_Preview">\sigma^2</span><script type="math/tex">\sigma^2</script></span>) is the ordinary least squares (OLS) solution:</li>
+<li>The MLE of <span class="arithmatex">\(\beta\)</span> (ignoring <span class="arithmatex">\(\sigma^2\)</span>) is the ordinary least squares (OLS) solution:</li>
 </ul>
-<div class="arithmatex">
-<div class="MathJax_Preview">
+<div class="arithmatex">\[
 \hat{\beta} = (X^T X)^{-1} X^T y
-</div>
-<script type="math/tex; mode=display">
-\hat{\beta} = (X^T X)^{-1} X^T y
-</script>
-</div>
-<h5 id="mle-for-sigma2sigma2"><strong>MLE for <span class="arithmatex"><span class="MathJax_Preview">\sigma^2</span><script type="math/tex">\sigma^2</script></span></strong></h5>
+\]</div>
+<h5 id="mle-for-sigma2"><strong>MLE for <span class="arithmatex">\(\sigma^2\)</span></strong></h5>
 <ul>
-<li>After finding <span class="arithmatex"><span class="MathJax_Preview">\hat{\beta}</span><script type="math/tex">\hat{\beta}</script></span>, the MLE of <span class="arithmatex"><span class="MathJax_Preview">\sigma^2</span><script type="math/tex">\sigma^2</script></span> is:</li>
+<li>After finding <span class="arithmatex">\(\hat{\beta}\)</span>, the MLE of <span class="arithmatex">\(\sigma^2\)</span> is:</li>
 </ul>
-<div class="arithmatex">
-<div class="MathJax_Preview">
+<div class="arithmatex">\[
 \hat{\sigma}^2 = \frac{1}{N} \| y - X\hat{\beta} \|^2
-</div>
-<script type="math/tex; mode=display">
-\hat{\sigma}^2 = \frac{1}{N} \| y - X\hat{\beta} \|^2
-</script>
-</div>
+\]</div>
 <h5 id="computational-techniques"><strong>Computational Techniques:</strong></h5>
 <ul>
 <li>
@@ -3175,67 +3052,52 @@ p(\beta \mid X, y, \sigma^2) \propto p(y \mid X, \beta, \sigma^2) p(\beta)
 <p>A <strong>Gaussian Process</strong> (GP) is a <strong>non-parametric</strong> model used for regression tasks. Unlike typical regression models that assume a functional form (like linear regression), GPR assumes that the data is drawn from a <strong>Gaussian distribution</strong> over functions.</p>
 <blockquote>
 <p>[! Definition] Definition<br />
-A <strong>Gaussian process</strong> is a collection of random variables, any finite number of which have a joint Gaussian distribution. It is completely specified by a <strong>mean function</strong> <span class="arithmatex"><span class="MathJax_Preview">m(x)</span><script type="math/tex">m(x)</script></span> and a <strong>covariance function</strong> (or kernel) <span class="arithmatex"><span class="MathJax_Preview">k(x, x')</span><script type="math/tex">k(x, x')</script></span>, which defines the correlation between inputs.</p>
+A <strong>Gaussian process</strong> is a collection of random variables, any finite number of which have a joint Gaussian distribution. It is completely specified by a <strong>mean function</strong> <span class="arithmatex">\(m(x)\)</span> and a <strong>covariance function</strong> (or kernel) <span class="arithmatex">\(k(x, x')\)</span>, which defines the correlation between inputs.</p>
 </blockquote>
-<div class="arithmatex">
-<div class="MathJax_Preview">
+<div class="arithmatex">\[
 f(x) \sim \mathcal{GP}(m(x), k(x, x'))
-</div>
-<script type="math/tex; mode=display">
-f(x) \sim \mathcal{GP}(m(x), k(x, x'))
-</script>
-</div>
+\]</div>
 <p>Where:</p>
 <ul>
 <li>
-<p><span class="arithmatex"><span class="MathJax_Preview">f(x)</span><script type="math/tex">f(x)</script></span> is the function value at input <span class="arithmatex"><span class="MathJax_Preview">x</span><script type="math/tex">x</script></span>,</p>
+<p><span class="arithmatex">\(f(x)\)</span> is the function value at input <span class="arithmatex">\(x\)</span>,</p>
 </li>
 <li>
-<p><span class="arithmatex"><span class="MathJax_Preview">m(x)</span><script type="math/tex">m(x)</script></span> is the <strong>mean function</strong> (often assumed to be zero),</p>
+<p><span class="arithmatex">\(m(x)\)</span> is the <strong>mean function</strong> (often assumed to be zero),</p>
 </li>
 <li>
-<p><span class="arithmatex"><span class="MathJax_Preview">k(x, x')</span><script type="math/tex">k(x, x')</script></span> is the <strong>covariance function</strong>, which defines the relationship between points <span class="arithmatex"><span class="MathJax_Preview">x</span><script type="math/tex">x</script></span> and <span class="arithmatex"><span class="MathJax_Preview">x'</span><script type="math/tex">x'</script></span>.</p>
+<p><span class="arithmatex">\(k(x, x')\)</span> is the <strong>covariance function</strong>, which defines the relationship between points <span class="arithmatex">\(x\)</span> and <span class="arithmatex">\(x'\)</span>.</p>
 </li>
 <li>
 <p><strong>Model Assumptions</strong>:</p>
 <ul>
 <li>
-<p>Assume the output <span class="arithmatex"><span class="MathJax_Preview">y</span><script type="math/tex">y</script></span> is a realization of a <strong>Gaussian process</strong>:</p>
-<div class="arithmatex">
-<div class="MathJax_Preview">  
+<p>Assume the output <span class="arithmatex">\(y\)</span> is a realization of a <strong>Gaussian process</strong>:</p>
+<div class="arithmatex">\[  
 f(x) \sim \mathcal{GP}(0, k(x, x')) 
-</div>
-<script type="math/tex; mode=display">  
-f(x) \sim \mathcal{GP}(0, k(x, x')) 
-</script>
-</div>
+\]</div>
 </li>
 </ul>
-<p>where <span class="arithmatex"><span class="MathJax_Preview">k(x, x')</span><script type="math/tex">k(x, x')</script></span> is a <strong>covariance kernel</strong> that defines the relationship between the points <span class="arithmatex"><span class="MathJax_Preview">x</span><script type="math/tex">x</script></span> and <span class="arithmatex"><span class="MathJax_Preview">x'</span><script type="math/tex">x'</script></span>.</p>
+<p>where <span class="arithmatex">\(k(x, x')\)</span> is a <strong>covariance kernel</strong> that defines the relationship between the points <span class="arithmatex">\(x\)</span> and <span class="arithmatex">\(x'\)</span>.</p>
 </li>
 <li>
 <p><strong>Likelihood</strong>:</p>
 <ul>
 <li>
-<p>Given <span class="arithmatex"><span class="MathJax_Preview">N</span><script type="math/tex">N</script></span> training points <span class="arithmatex"><span class="MathJax_Preview">X = \{x_1, x_2, …, x_N\}</span><script type="math/tex">X = \{x_1, x_2, …, x_N\}</script></span> and corresponding outputs <span class="arithmatex"><span class="MathJax_Preview">y = \{y_1, y_2, …, y_N\}</span><script type="math/tex">y = \{y_1, y_2, …, y_N\}</script></span>, the likelihood of the observations is given by the <strong>multivariate normal distribution</strong>:</p>
-<div class="arithmatex">
-<div class="MathJax_Preview">  
+<p>Given <span class="arithmatex">\(N\)</span> training points <span class="arithmatex">\(X = \{x_1, x_2, …, x_N\}\)</span> and corresponding outputs <span class="arithmatex">\(y = \{y_1, y_2, …, y_N\}\)</span>, the likelihood of the observations is given by the <strong>multivariate normal distribution</strong>:</p>
+<div class="arithmatex">\[  
 p(y \mid X, \theta) = \mathcal{N}(y \mid 0, K(X, X) + \sigma^2 I)
-</div>
-<script type="math/tex; mode=display">  
-p(y \mid X, \theta) = \mathcal{N}(y \mid 0, K(X, X) + \sigma^2 I)
-</script>
-</div>
+\]</div>
 <p>where:</p>
 </li>
 <li>
-<p><span class="arithmatex"><span class="MathJax_Preview">K(X, X)</span><script type="math/tex">K(X, X)</script></span> is the <strong>covariance matrix</strong> computed using the kernel function <span class="arithmatex"><span class="MathJax_Preview">k(x, x')</span><script type="math/tex">k(x, x')</script></span>,</p>
+<p><span class="arithmatex">\(K(X, X)\)</span> is the <strong>covariance matrix</strong> computed using the kernel function <span class="arithmatex">\(k(x, x')\)</span>,</p>
 </li>
 <li>
-<p><span class="arithmatex"><span class="MathJax_Preview">\sigma^2</span><script type="math/tex">\sigma^2</script></span> is the noise variance, and</p>
+<p><span class="arithmatex">\(\sigma^2\)</span> is the noise variance, and</p>
 </li>
 <li>
-<p><span class="arithmatex"><span class="MathJax_Preview">I</span><script type="math/tex">I</script></span> is the identity matrix.</p>
+<p><span class="arithmatex">\(I\)</span> is the identity matrix.</p>
 </li>
 </ul>
 </li>
@@ -3244,17 +3106,12 @@ p(y \mid X, \theta) = \mathcal{N}(y \mid 0, K(X, X) + \sigma^2 I)
 <ul>
 <li>
 <p>The log-likelihood is:</p>
-<div class="arithmatex">
-<div class="MathJax_Preview">  
+<div class="arithmatex">\[  
 \log p(y \mid X, \theta) = -\frac{1}{2} y^T (K(X, X) + \sigma^2 I)^{-1} y - \frac{1}{2} \log \det (K(X, X) + \sigma^2 I) - \frac{N}{2} \log 2\pi    
-</div>
-<script type="math/tex; mode=display">  
-\log p(y \mid X, \theta) = -\frac{1}{2} y^T (K(X, X) + \sigma^2 I)^{-1} y - \frac{1}{2} \log \det (K(X, X) + \sigma^2 I) - \frac{N}{2} \log 2\pi    
-</script>
-</div>
+\]</div>
 </li>
 <li>
-<p>Here, <span class="arithmatex"><span class="MathJax_Preview">\theta</span><script type="math/tex">\theta</script></span> refers to the kernel hyperparameters (e.g., length scale, variance) and <span class="arithmatex"><span class="MathJax_Preview">\sigma^2</span><script type="math/tex">\sigma^2</script></span> is the noise parameter.</p>
+<p>Here, <span class="arithmatex">\(\theta\)</span> refers to the kernel hyperparameters (e.g., length scale, variance) and <span class="arithmatex">\(\sigma^2\)</span> is the noise parameter.</p>
 </li>
 </ul>
 </li>
@@ -3262,15 +3119,10 @@ p(y \mid X, \theta) = \mathcal{N}(y \mid 0, K(X, X) + \sigma^2 I)
 <p><strong>Optimization</strong>:</p>
 <ul>
 <li>
-<p>To find the <strong>maximum likelihood estimate (MLE)</strong> of the kernel parameters <span class="arithmatex"><span class="MathJax_Preview">\theta</span><script type="math/tex">\theta</script></span> and <span class="arithmatex"><span class="MathJax_Preview">\sigma^2</span><script type="math/tex">\sigma^2</script></span>, we maximize the log-likelihood:</p>
-<div class="arithmatex">
-<div class="MathJax_Preview">  
+<p>To find the <strong>maximum likelihood estimate (MLE)</strong> of the kernel parameters <span class="arithmatex">\(\theta\)</span> and <span class="arithmatex">\(\sigma^2\)</span>, we maximize the log-likelihood:</p>
+<div class="arithmatex">\[  
 \hat{\theta}, \hat{\sigma^2} = \arg \max_\theta \log p(y \mid X, \theta)    
-</div>
-<script type="math/tex; mode=display">  
-\hat{\theta}, \hat{\sigma^2} = \arg \max_\theta \log p(y \mid X, \theta)    
-</script>
-</div>
+\]</div>
 </li>
 <li>
 <p>This is typically done via numerical optimization techniques like gradient descent or conjugate gradient methods, since the log-likelihood is non-linear with respect to the kernel parameters.</p>
@@ -3281,92 +3133,57 @@ p(y \mid X, \theta) = \mathcal{N}(y \mid 0, K(X, X) + \sigma^2 I)
 <p><strong>Prediction</strong>:</p>
 <ul>
 <li>
-<p>Once the kernel parameters are optimized, predictions at a new test point <span class="arithmatex"><span class="MathJax_Preview">x_*</span><script type="math/tex">x_*</script></span> can be made by conditioning the Gaussian process on the training data. The predictive mean and variance are given by:</p>
-<div class="arithmatex">
-<div class="MathJax_Preview">
+<p>Once the kernel parameters are optimized, predictions at a new test point <span class="arithmatex">\(x_*\)</span> can be made by conditioning the Gaussian process on the training data. The predictive mean and variance are given by:</p>
+<div class="arithmatex">\[
 \mu_* = k(x_*, X) [K(X, X) + \sigma^2 I]^{-1} y
-</div>
-<script type="math/tex; mode=display">
-\mu_* = k(x_*, X) [K(X, X) + \sigma^2 I]^{-1} y
-</script>
-</div>
-<div class="arithmatex">
-<div class="MathJax_Preview">
+\]</div>
+<div class="arithmatex">\[
 \sigma_*^2 = k(x_*, x_*) - k(x_*, X) [K(X, X) + \sigma^2 I]^{-1} k(X, x_*)
-</div>
-<script type="math/tex; mode=display">
-\sigma_*^2 = k(x_*, x_*) - k(x_*, X) [K(X, X) + \sigma^2 I]^{-1} k(X, x_*)
-</script>
-</div>
+\]</div>
 </li>
 <li>
-<p>Here, <span class="arithmatex"><span class="MathJax_Preview">k(x_*, X)</span><script type="math/tex">k(x_*, X)</script></span> is the covariance between the test point <span class="arithmatex"><span class="MathJax_Preview">x_*</span><script type="math/tex">x_*</script></span> and the training points <span class="arithmatex"><span class="MathJax_Preview">X</span><script type="math/tex">X</script></span>, and <span class="arithmatex"><span class="MathJax_Preview">k(x_*, x_*)</span><script type="math/tex">k(x_*, x_*)</script></span> is the covariance at the test point.</p>
+<p>Here, <span class="arithmatex">\(k(x_*, X)\)</span> is the covariance between the test point <span class="arithmatex">\(x_*\)</span> and the training points <span class="arithmatex">\(X\)</span>, and <span class="arithmatex">\(k(x_*, x_*)\)</span> is the covariance at the test point.</p>
 </li>
 </ul>
 </li>
 <li>
 <p><strong>Model Definition:</strong></p>
-<p>A Gaussian Process defines a <strong>prior</strong> over functions. We assume the function values <span class="arithmatex"><span class="MathJax_Preview">f(x)</span><script type="math/tex">f(x)</script></span> at any set of points <span class="arithmatex"><span class="MathJax_Preview">X</span><script type="math/tex">X</script></span> follow a multivariate normal distribution:</p>
-<div class="arithmatex">
-<div class="MathJax_Preview">  
+<p>A Gaussian Process defines a <strong>prior</strong> over functions. We assume the function values <span class="arithmatex">\(f(x)\)</span> at any set of points <span class="arithmatex">\(X\)</span> follow a multivariate normal distribution:</p>
+<div class="arithmatex">\[  
 f(X) \sim \mathcal{N}(0, K(X, X))
-</div>
-<script type="math/tex; mode=display">  
-f(X) \sim \mathcal{N}(0, K(X, X))
-</script>
-</div>
-<p>where <span class="arithmatex"><span class="MathJax_Preview">K(X, X)</span><script type="math/tex">K(X, X)</script></span> is the <strong>covariance matrix</strong> determined by the chosen kernel (covariance function). Common kernels include the <strong>RBF kernel</strong> (Radial Basis Function), <strong>Matern kernel</strong>, etc.</p>
+\]</div>
+<p>where <span class="arithmatex">\(K(X, X)\)</span> is the <strong>covariance matrix</strong> determined by the chosen kernel (covariance function). Common kernels include the <strong>RBF kernel</strong> (Radial Basis Function), <strong>Matern kernel</strong>, etc.</p>
 </li>
 <li>
 <p><strong>Likelihood Function:</strong></p>
-<p>Given the observations <span class="arithmatex"><span class="MathJax_Preview">y = f(X) + \epsilon</span><script type="math/tex">y = f(X) + \epsilon</script></span>, where <span class="arithmatex"><span class="MathJax_Preview">\epsilon</span><script type="math/tex">\epsilon</script></span> is noise, the likelihood function is:</p>
-<div class="arithmatex">
-<div class="MathJax_Preview">  
+<p>Given the observations <span class="arithmatex">\(y = f(X) + \epsilon\)</span>, where <span class="arithmatex">\(\epsilon\)</span> is noise, the likelihood function is:</p>
+<div class="arithmatex">\[  
 p(y \mid X, \theta) = \mathcal{N}(y \mid 0, K(X, X) + \sigma^2 I)
-</div>
-<script type="math/tex; mode=display">  
-p(y \mid X, \theta) = \mathcal{N}(y \mid 0, K(X, X) + \sigma^2 I)
-</script>
-</div>
-<p>where <span class="arithmatex"><span class="MathJax_Preview">\sigma^2</span><script type="math/tex">\sigma^2</script></span> is the noise variance.</p>
+\]</div>
+<p>where <span class="arithmatex">\(\sigma^2\)</span> is the noise variance.</p>
 </li>
 <li>
 <p><strong>Posterior Distribution:</strong></p>
-<p>The posterior distribution of the function values <span class="arithmatex"><span class="MathJax_Preview">f_*</span><script type="math/tex">f_*</script></span> at new test points <span class="arithmatex"><span class="MathJax_Preview">X_*</span><script type="math/tex">X_*</script></span>, given the training data <span class="arithmatex"><span class="MathJax_Preview">(X, y)</span><script type="math/tex">(X, y)</script></span>, is also Gaussian:</p>
-<div class="arithmatex">
-<div class="MathJax_Preview">  
+<p>The posterior distribution of the function values <span class="arithmatex">\(f_*\)</span> at new test points <span class="arithmatex">\(X_*\)</span>, given the training data <span class="arithmatex">\((X, y)\)</span>, is also Gaussian:</p>
+<div class="arithmatex">\[  
 p(f_* \mid X_*, X, y) = \mathcal{N}(f_* \mid \mu_*, \Sigma_*)   
-</div>
-<script type="math/tex; mode=display">  
-p(f_* \mid X_*, X, y) = \mathcal{N}(f_* \mid \mu_*, \Sigma_*)   
-</script>
-</div>
+\]</div>
 <p>where:</p>
 <ul>
 <li>
-<p><span class="arithmatex"><span class="MathJax_Preview">\mu_*</span><script type="math/tex">\mu_*</script></span> is the mean of the posterior, and</p>
+<p><span class="arithmatex">\(\mu_*\)</span> is the mean of the posterior, and</p>
 </li>
 <li>
-<p><span class="arithmatex"><span class="MathJax_Preview">\Sigma_*</span><script type="math/tex">\Sigma_*</script></span> is the covariance (uncertainty).</p>
+<p><span class="arithmatex">\(\Sigma_*\)</span> is the covariance (uncertainty).</p>
 </li>
 </ul>
 <p>The mean and covariance of the posterior are given by:</p>
-<div class="arithmatex">
-<div class="MathJax_Preview">  
+<div class="arithmatex">\[  
 \mu_* = K(X_*, X)[K(X, X) + \sigma^2 I]^{-1} y  
-</div>
-<script type="math/tex; mode=display">  
-\mu_* = K(X_*, X)[K(X, X) + \sigma^2 I]^{-1} y  
-</script>
-</div>
-<div class="arithmatex">
-<div class="MathJax_Preview">  
+\]</div>
+<div class="arithmatex">\[  
 \Sigma_* = K(X_*, X_*) - K(X_*, X)[K(X, X) + \sigma^2 I]^{-1} K(X, X_*) 
-</div>
-<script type="math/tex; mode=display">  
-\Sigma_* = K(X_*, X_*) - K(X_*, X)[K(X, X) + \sigma^2 I]^{-1} K(X, X_*) 
-</script>
-</div>
+\]</div>
 </li>
 <li>
 <p><strong>Iterative Methods:</strong></p>
@@ -3400,86 +3217,71 @@ p(f_* \mid X_*, X, y) = \mathcal{N}(f_* \mid \mu_*, \Sigma_*)
 </ul>
 <h4 id="newtons-method"><strong>Newton's Method</strong></h4>
 <p>Newton's method uses the <strong>Hessian matrix</strong> (second derivative) for optimization:</p>
-<div class="arithmatex">
-<div class="MathJax_Preview">
+<div class="arithmatex">\[
 \theta_{t+1} = \theta_t - H^{-1} \nabla f(\theta)
-</div>
-<script type="math/tex; mode=display">
-\theta_{t+1} = \theta_t - H^{-1} \nabla f(\theta)
-</script>
-</div>
+\]</div>
 <p>where:</p>
 <ul>
 <li>
-<p><span class="arithmatex"><span class="MathJax_Preview">H</span><script type="math/tex">H</script></span> is the Hessian matrix (second derivative of the loss function).</p>
+<p><span class="arithmatex">\(H\)</span> is the Hessian matrix (second derivative of the loss function).</p>
 </li>
 <li>
-<p><span class="arithmatex"><span class="MathJax_Preview">\nabla f(\theta)</span><script type="math/tex">\nabla f(\theta)</script></span> is the gradient.</p>
+<p><span class="arithmatex">\(\nabla f(\theta)\)</span> is the gradient.</p>
 </li>
 </ul>
 <h4 id="momentum-based-update"><strong>Momentum-based Update</strong></h4>
 <p>Momentum accelerates gradient descent by adding a fraction of the previous update to the current one:</p>
-<div class="arithmatex">
-<div class="MathJax_Preview">
+<div class="arithmatex">\[
 v_t = \beta v_{t-1} - \alpha \nabla f(\theta_t)
-</div>
-<script type="math/tex; mode=display">
-v_t = \beta v_{t-1} - \alpha \nabla f(\theta_t)
-</script>
-</div>
-<div class="arithmatex">
-<div class="MathJax_Preview">
+\]</div>
+<div class="arithmatex">\[
 \theta_{t+1} = \theta_t + v_t
-</div>
-<script type="math/tex; mode=display">
-\theta_{t+1} = \theta_t + v_t
-</script>
-</div>
+\]</div>
 <p>where:</p>
 <ul>
 <li>
-<p><span class="arithmatex"><span class="MathJax_Preview">v_t</span><script type="math/tex">v_t</script></span> is the velocity term,</p>
+<p><span class="arithmatex">\(v_t\)</span> is the velocity term,</p>
 </li>
 <li>
-<p><span class="arithmatex"><span class="MathJax_Preview">\beta</span><script type="math/tex">\beta</script></span> is the momentum coefficient (e.g., 0.9),</p>
+<p><span class="arithmatex">\(\beta\)</span> is the momentum coefficient (e.g., 0.9),</p>
 </li>
 <li>
-<p><span class="arithmatex"><span class="MathJax_Preview">\alpha</span><script type="math/tex">\alpha</script></span> is the learning rate.
-<div class="highlight"><table class="highlighttable"><tr><th colspan="2" class="filename"><span class="filename">Python</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-14-1"> 1</a></span>
-<span class="normal"><a href="#__codelineno-14-2"> 2</a></span>
-<span class="normal"><a href="#__codelineno-14-3"> 3</a></span>
-<span class="normal"><a href="#__codelineno-14-4"> 4</a></span>
-<span class="normal"><a href="#__codelineno-14-5"> 5</a></span>
-<span class="normal"><a href="#__codelineno-14-6"> 6</a></span>
-<span class="normal"><a href="#__codelineno-14-7"> 7</a></span>
-<span class="normal"><a href="#__codelineno-14-8"> 8</a></span>
-<span class="normal"><a href="#__codelineno-14-9"> 9</a></span>
-<span class="normal"><a href="#__codelineno-14-10">10</a></span>
-<span class="normal"><a href="#__codelineno-14-11">11</a></span>
-<span class="normal"><a href="#__codelineno-14-12">12</a></span>
-<span class="normal"><a href="#__codelineno-14-13">13</a></span>
-<span class="normal"><a href="#__codelineno-14-14">14</a></span>
-<span class="normal"><a href="#__codelineno-14-15">15</a></span>
-<span class="normal"><a href="#__codelineno-14-16">16</a></span>
-<span class="normal"><a href="#__codelineno-14-17">17</a></span>
-<span class="normal"><a href="#__codelineno-14-18">18</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1"></a><span class="n">iterations</span> <span class="o">=</span> <span class="mi">500</span>
-<a id="__codelineno-14-2" name="__codelineno-14-2"></a><span class="n">step_size</span> <span class="o">=</span> <span class="mf">0.1</span>
-<a id="__codelineno-14-3" name="__codelineno-14-3"></a><span class="n">beta</span> <span class="o">=</span> <span class="mf">0.9</span>  <span class="c1"># Momentum coefficient</span>
-<a id="__codelineno-14-4" name="__codelineno-14-4"></a><span class="n">dataset</span> <span class="o">=</span> <span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">)</span>
-<a id="__codelineno-14-5" name="__codelineno-14-5"></a>
-<a id="__codelineno-14-6" name="__codelineno-14-6"></a><span class="k">for</span> <span class="n">order</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="mi">2</span><span class="p">):</span>
-<a id="__codelineno-14-7" name="__codelineno-14-7"></a>    <span class="n">weights</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">order</span><span class="p">)</span> <span class="o">*</span> <span class="mf">1.5</span>
-<a id="__codelineno-14-8" name="__codelineno-14-8"></a>    <span class="n">velocity</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">order</span><span class="p">)</span>  <span class="c1"># Initialize velocity</span>
-<a id="__codelineno-14-9" name="__codelineno-14-9"></a>
-<a id="__codelineno-14-10" name="__codelineno-14-10"></a>    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">iterations</span><span class="p">):</span>
-<a id="__codelineno-14-11" name="__codelineno-14-11"></a>        <span class="n">params</span> <span class="o">=</span> <span class="n">weights</span>
-<a id="__codelineno-14-12" name="__codelineno-14-12"></a>        <span class="n">loss_</span> <span class="o">=</span> <span class="n">loss</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">dataset</span><span class="p">)</span>
-<a id="__codelineno-14-13" name="__codelineno-14-13"></a>        <span class="n">params_grad</span> <span class="o">=</span> <span class="n">loss_grad</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">dataset</span><span class="p">)</span>
-<a id="__codelineno-14-14" name="__codelineno-14-14"></a>
-<a id="__codelineno-14-15" name="__codelineno-14-15"></a>        <span class="c1"># Update parameters using Momentum</span>
-<a id="__codelineno-14-16" name="__codelineno-14-16"></a>        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">order</span><span class="p">):</span>
-<a id="__codelineno-14-17" name="__codelineno-14-17"></a>            <span class="n">velocity</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">beta</span> <span class="o">*</span> <span class="n">velocity</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">-</span> <span class="n">step_size</span> <span class="o">*</span> <span class="n">params_grad</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>  <span class="c1"># Apply momentum update</span>
-<a id="__codelineno-14-18" name="__codelineno-14-18"></a>            <span class="n">weights</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">weights</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">+</span> <span class="n">velocity</span><span class="p">[</span><span class="n">j</span><span class="p">])</span>  <span class="c1"># Update weights</span>
+<p><span class="arithmatex">\(\alpha\)</span> is the learning rate.
+<div class="highlight"><table class="highlighttable"><tr><th colspan="2" class="filename"><span class="filename">Python</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="n">iterations</span> <span class="o">=</span> <span class="mi">500</span>
+<span class="n">step_size</span> <span class="o">=</span> <span class="mf">0.1</span>
+<span class="n">beta</span> <span class="o">=</span> <span class="mf">0.9</span>  <span class="c1"># Momentum coefficient</span>
+<span class="n">dataset</span> <span class="o">=</span> <span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">order</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="mi">2</span><span class="p">):</span>
+    <span class="n">weights</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">order</span><span class="p">)</span> <span class="o">*</span> <span class="mf">1.5</span>
+    <span class="n">velocity</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">order</span><span class="p">)</span>  <span class="c1"># Initialize velocity</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">iterations</span><span class="p">):</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="n">weights</span>
+        <span class="n">loss_</span> <span class="o">=</span> <span class="n">loss</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">dataset</span><span class="p">)</span>
+        <span class="n">params_grad</span> <span class="o">=</span> <span class="n">loss_grad</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">dataset</span><span class="p">)</span>
+
+        <span class="c1"># Update parameters using Momentum</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">order</span><span class="p">):</span>
+            <span class="n">velocity</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">beta</span> <span class="o">*</span> <span class="n">velocity</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">-</span> <span class="n">step_size</span> <span class="o">*</span> <span class="n">params_grad</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>  <span class="c1"># Apply momentum update</span>
+            <span class="n">weights</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">weights</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">+</span> <span class="n">velocity</span><span class="p">[</span><span class="n">j</span><span class="p">])</span>  <span class="c1"># Update weights</span>
 </code></pre></div></td></tr></table></div></p>
 </li>
 </ul>

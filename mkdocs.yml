@@ -1,6 +1,25 @@
-site_name: byteyus
-docs_dir: docs
-theme: readthedocs
+site_name: byteyu
+theme:
+  name: material
+  features:
+    - content.code.annotate
 
 markdown_extensions:
-  - pymdownx.arithmatex
+  - pymdownx.arithmatex:
+      generic: true 
+  - pymdownx.superfences
+  - pymdownx.highlight:
+      auto_title: true
+      linenums: true
+      pygments_style: material
+
+extra_css:
+  - https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css
+  - stylesheets/code.css
+  - stylesheets/math.css
+
+extra_javascript:
+  - https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js
+  - https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js
+  - js/math.js
+

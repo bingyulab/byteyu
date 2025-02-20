@@ -1,3 +1,6 @@
 site_name: byteyus
 docs_dir: docs
 theme: readthedocs
+
+markdown_extensions:
+  - pymdownx.arithmatex
